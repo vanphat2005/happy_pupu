@@ -2568,6 +2568,9 @@
                 pinLock.classList.add('unlocked');
                 if (pinStatus) pinStatus.textContent = 'ĐÚNG — CỬA ĐANG MỞ';
                 pinInputs.forEach(input => input.disabled = true);
+                if (typeof window.preloadPanoramaPhotos === 'function') {
+                    window.preloadPanoramaPhotos();
+                }
 
                 if (doorLeaf) doorLeaf.classList.add('is-opening');
 
@@ -2660,6 +2663,25 @@
         const idleRotateSpeed = 0.035;
         let activeObjectUrl = null;
         const defaultFov = 75;
+        const albumPhotoUrls = Array.from({ length: 20 }, (_, index) =>
+            `image/360/pu${index + 1}.jpg`
+        );
+        const preloadedPhotoImages = new Map();
+
+        function preloadPanoramaPhotos() {
+            albumPhotoUrls.forEach((url) => {
+                if (preloadedPhotoImages.has(url)) return;
+                const image = new Image();
+                image.decoding = 'async';
+                image.addEventListener('error', () => {
+                    console.error(`Không tải được ảnh gallery "${url}"`);
+                }, { once: true });
+                image.src = url;
+                preloadedPhotoImages.set(url, image);
+            });
+        }
+
+        window.preloadPanoramaPhotos = preloadPanoramaPhotos;
 
         function applyPanoramaTexture(texture) {
             texture.colorSpace = THREE.SRGBColorSpace;
@@ -2736,28 +2758,7 @@
             albumGroup = new THREE.Group();
             albumPhotoMeshes = [];
 
-            const photoUrls = [
-                'image/pu1.JPG',
-                'image/pu2.jpg',
-                'image/pu3.JPG',
-                'image/pu4.JPG',
-                'image/pu5.JPG',
-                'image/pu6.JPG',
-                'image/pu7.JPG',
-                'image/pu8.JPG',
-                'image/pu9.JPG',
-                'image/pu10.jpeg',
-                'image/pu11.JPG',
-                'image/pu12.JPG',
-                'image/pu13.JPG',
-                'image/pu14.jpeg',
-                'image/pu15.JPG',
-                'image/pu16.jpeg',
-                'image/pu17.jpeg',
-                'image/pu18.JPG',
-                'image/pu19.JPG',
-                'image/pu20.JPG'
-            ];
+            const photoUrls = albumPhotoUrls;
             const loader = new THREE.TextureLoader();
             const stickerUrls = ['sticker/gaudau.png', 'sticker/socola.png'];
             const stickerTextures = stickerUrls.map((url) => loader.load(
@@ -2860,8 +2861,11 @@
                 const photoUrl = photoUrls[index % photoUrls.length];
                 loader.load(photoUrl, (texture) => {
                     texture.colorSpace = THREE.SRGBColorSpace;
+                    const fallbackTexture = photo.material.map;
                     photo.material.map = texture;
                     photo.material.needsUpdate = true;
+                    fallbackTexture?.dispose();
+                    preloadedPhotoImages.delete(photoUrl);
                 }, undefined, (error) => console.error(`Không tải được ảnh gallery "${photoUrl}":`, error));
             }
 
@@ -2996,7 +3000,8 @@
             const width = Math.max(1, viewerRoot.clientWidth);
             const height = Math.max(1, viewerRoot.clientHeight);
             renderer.setSize(width, height, false);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+            const maxPixelRatio = window.innerWidth <= 768 ? 1.25 : 2;
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
             camera.aspect = width / height;
             camera.updateProjectionMatrix();
         }
@@ -3037,7 +3042,8 @@
                     premultipliedAlpha: false
                 });
                 renderer.setClearColor(0x000000, 0);
-                renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+                const maxPixelRatio = window.innerWidth <= 768 ? 1.25 : 2;
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
                 renderer.outputColorSpace = THREE.SRGBColorSpace;
                 scene = new THREE.Scene();
                 camera = new THREE.PerspectiveCamera(defaultFov, 1, .1, 1100);
@@ -3053,7 +3059,9 @@
         }
 
         window.initPanoramaViewer = initializeViewer;
-        window.addEventListener('panorama-viewer-ready', initializeViewer);
+        window.addEventListener('panorama-viewer-ready', () => {
+            if (viewerRoot.classList.contains('active')) initializeViewer();
+        });
         window.dispatchEvent(new Event('panorama-viewer-ready'));
 
         viewerCanvas.addEventListener('pointerdown', (event) => {
