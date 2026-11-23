@@ -2647,8 +2647,17 @@
         let renderer, scene, camera, sphere, animationId;
         let albumGroup = null;
         let albumPhotoMeshes = [];
+        let albumAnimations = [];
+        let albumAnimationStart = 0;
+        const albumRevealDuration = 600;
+        const albumRevealStagger = 34;
+        const galleryCenter = new THREE.Vector3(0, 0, -355);
         let yaw = 0, pitch = 0, targetYaw = 0, targetPitch = 0;
         let dragging = false, lastX = 0, lastY = 0;
+        let lastInteractionTime = performance.now();
+        let lastFrameTime = 0;
+        const idleRotateDelay = 1400;
+        const idleRotateSpeed = 0.035;
         let activeObjectUrl = null;
         const defaultFov = 75;
 
@@ -2749,40 +2758,92 @@
             const photoUrls = ['image/chibidangtruoc.png', 'image/chibidangsau.png'];
             const loader = new THREE.TextureLoader();
             const cardCount = 32;
+            albumAnimations = [];
+            albumAnimationStart = performance.now();
+            lastInteractionTime = albumAnimationStart;
 
-            for (let index = 0; index < cardCount; index++) {
-                const yRatio = 1 - ((index + 0.5) / cardCount) * 2;
+            const photoTargets = [galleryCenter.clone()];
+            for (let index = 1; index < cardCount; index++) {
+                const pointIndex = index - 1;
+                const total = cardCount - 1;
+                const yRatio = 1 - ((pointIndex + 0.5) / total) * 2;
                 const polar = Math.acos(yRatio);
-                const longitude = index * Math.PI * (3 - Math.sqrt(5));
+                const longitude = pointIndex * Math.PI * (3 - Math.sqrt(5)) + 0.8;
                 const horizontal = Math.sin(polar);
-                const radius = 355;
-                const position = new THREE.Vector3(
+                const radius = 300 + ((index * 37) % 121);
+                photoTargets.push(new THREE.Vector3(
                     radius * horizontal * Math.cos(longitude),
                     radius * Math.cos(polar),
                     radius * horizontal * Math.sin(longitude)
-                );
+                ));
+            }
+
+            const revealOrder = photoTargets
+                .map((position, index) => ({
+                    index,
+                    angle: index === 0 ? -1 : Math.acos(THREE.MathUtils.clamp(-position.z / position.length(), -1, 1))
+                }))
+                .filter(item => item.index !== 0)
+                .sort((a, b) => a.angle - b.angle);
+            const revealRank = new Map(revealOrder.map((item, index) => [item.index, index]));
+
+            for (let index = 0; index < cardCount; index++) {
+                const position = photoTargets[index];
+                const start = new THREE.Vector3(0, 0, -760);
+                const card = new THREE.Group();
+                card.position.copy(position);
+                card.lookAt(0, 0, 0);
+                card.rotateZ(index === 0 ? 0 : ((index % 7) - 3) * 0.045);
+                const targetQuaternion = card.quaternion.clone();
+                card.position.copy(start);
+                card.quaternion.copy(targetQuaternion);
+                card.rotateZ(index === 0 ? 0 : ((index % 2 ? 1 : -1) * 0.34));
+                card.scale.setScalar(index === 0 ? 0.045 : 0.025);
 
                 const frame = new THREE.Mesh(
                     new THREE.PlaneGeometry(74, 92),
-                    new THREE.MeshBasicMaterial({ color: 0xfdfafb, side: THREE.DoubleSide })
+                    new THREE.MeshBasicMaterial({
+                        color: 0xfdfafb,
+                        side: THREE.DoubleSide,
+                        transparent: true,
+                        opacity: 0,
+                        depthWrite: false
+                    })
                 );
-                frame.position.copy(position);
-                frame.lookAt(0, 0, 0);
+                frame.position.z = -1;
                 frame.rotateZ(((index % 5) - 2) * 0.018);
-                albumGroup.add(frame);
+                card.add(frame);
 
                 const photo = new THREE.Mesh(
                     new THREE.PlaneGeometry(62, 80),
                     new THREE.MeshBasicMaterial({
                         map: makeFallbackCardTexture(index),
-                        side: THREE.DoubleSide
+                        side: THREE.DoubleSide,
+                        transparent: true,
+                        opacity: 0,
+                        depthWrite: false
                     })
                 );
-                photo.position.copy(position);
-                photo.lookAt(0, 0, 0);
+                photo.position.z = 0.5;
                 photo.rotateZ(((index % 5) - 2) * 0.018);
-                albumGroup.add(photo);
+                card.add(photo);
                 albumPhotoMeshes.push(photo);
+                albumGroup.add(card);
+                albumAnimations.push({
+                    object: card,
+                    start,
+                    target: position.clone(),
+                    curve: new THREE.Vector3(
+                        Math.sin(index * 12.98) * 48,
+                        Math.cos(index * 7.31) * 48,
+                        Math.sin(index * 4.12) * 20
+                    ),
+                    startQuaternion: card.quaternion.clone(),
+                    targetQuaternion,
+                    delay: index === 0 ? 0 : 280 + revealRank.get(index) * albumRevealStagger,
+                    duration: albumRevealDuration,
+                    startScale: index === 0 ? 0.045 : 0.025
+                });
 
                 const photoUrl = photoUrls[index % photoUrls.length];
                 loader.load(photoUrl, (texture) => {
@@ -2814,7 +2875,28 @@
                 const label = makeLabelSprite(text);
                 label.position.copy(position);
                 label.lookAt(0, 0, 0);
+                const targetQuaternion = label.quaternion.clone();
+                const start = new THREE.Vector3(0, 0, -760);
+                label.position.copy(start);
+                label.quaternion.copy(targetQuaternion);
+                label.rotateZ((index % 2 ? 1 : -1) * 0.18);
+                const startQuaternion = label.quaternion.clone();
+                const targetScale = label.scale.clone();
+                label.scale.setScalar(0.015);
+                label.material.opacity = 0;
                 albumGroup.add(label);
+                albumAnimations.push({
+                    object: label,
+                    start,
+                    target: position,
+                    curve: new THREE.Vector3((index % 2 ? 1 : -1) * 42, 18, 12),
+                    startQuaternion,
+                    targetQuaternion,
+                    delay: (cardCount + index * 2) * albumRevealStagger,
+                    duration: albumRevealDuration,
+                    startScale: 0.015,
+                    targetScale
+                });
             });
 
             const symbols = ['♡', '✿', '⭐', '✦', '🎀', '🐱', '💌', '🌸'];
@@ -2829,10 +2911,67 @@
                 const icon = makeIconSprite(symbol);
                 icon.position.copy(position);
                 icon.lookAt(0, 0, 0);
+                const targetQuaternion = icon.quaternion.clone();
+                const start = new THREE.Vector3(0, 0, -760);
+                icon.position.copy(start);
+                icon.quaternion.copy(targetQuaternion);
+                icon.rotateZ((index % 2 ? 1 : -1) * 0.28);
+                const startQuaternion = icon.quaternion.clone();
+                const targetScale = icon.scale.clone();
+                icon.scale.setScalar(0.015);
+                icon.material.opacity = 0;
                 albumGroup.add(icon);
+                albumAnimations.push({
+                    object: icon,
+                    start,
+                    target: position,
+                    curve: new THREE.Vector3((index % 2 ? -1 : 1) * 60, -26, 18),
+                    startQuaternion,
+                    targetQuaternion,
+                    delay: (cardCount + 10 + index * 2) * albumRevealStagger,
+                    duration: albumRevealDuration,
+                    startScale: 0.015,
+                    targetScale
+                });
             });
 
             scene.add(albumGroup);
+        }
+
+        function updateAlbumReveal(now) {
+            if (!albumAnimations.length) return;
+            for (let index = albumAnimations.length - 1; index >= 0; index--) {
+                const animation = albumAnimations[index];
+                const elapsed = now - albumAnimationStart - animation.delay;
+                const progress = THREE.MathUtils.clamp(elapsed / animation.duration, 0, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const flight = progress < 1
+                    ? eased + Math.sin(progress * Math.PI) * 0.045
+                    : 1;
+                animation.object.position.lerpVectors(animation.start, animation.target, flight);
+                if (animation.curve) {
+                    animation.object.position.addScaledVector(animation.curve, Math.sin(progress * Math.PI));
+                }
+                if (animation.startQuaternion && animation.targetQuaternion) {
+                    animation.object.quaternion.slerpQuaternions(
+                        animation.startQuaternion,
+                        animation.targetQuaternion,
+                        eased
+                    );
+                }
+
+                const targetScale = animation.targetScale || new THREE.Vector3(1, 1, 1);
+                const scale = animation.startScale + (1 - animation.startScale) * flight;
+                animation.object.scale.set(
+                    targetScale.x * scale,
+                    targetScale.y * scale,
+                    targetScale.z * scale
+                );
+                animation.object.traverse((child) => {
+                    if (child.material) child.material.opacity = THREE.MathUtils.clamp(progress * 1.8, 0, 1);
+                });
+                if (progress === 1) albumAnimations.splice(index, 1);
+            }
         }
 
         function resizeViewer() {
@@ -2848,6 +2987,17 @@
         function renderViewer() {
             animationId = requestAnimationFrame(renderViewer);
             if (!renderer || !scene || !camera) return;
+            const now = performance.now();
+            const delta = lastFrameTime ? Math.min((now - lastFrameTime) / 1000, 0.05) : 0;
+            lastFrameTime = now;
+            updateAlbumReveal(now);
+            if (
+                viewerRoot.classList.contains('active')
+                && !dragging
+                && now - lastInteractionTime > idleRotateDelay
+            ) {
+                targetYaw += idleRotateSpeed * delta;
+            }
             yaw += (targetYaw - yaw) * .12;
             pitch += (targetPitch - pitch) * .12;
             camera.rotation.order = 'YXZ';
@@ -2857,7 +3007,11 @@
         }
 
         function initializeViewer() {
-            if (renderer) { resizeViewer(); return; }
+            if (renderer) {
+                resizeViewer();
+                if (viewerRoot.classList.contains('active') && !albumGroup) createAlbumCards();
+                return;
+            }
             try {
                 renderer = new THREE.WebGLRenderer({
                     canvas: viewerCanvas,
@@ -2871,7 +3025,7 @@
                 scene = new THREE.Scene();
                 camera = new THREE.PerspectiveCamera(defaultFov, 1, .1, 1100);
                 camera.position.set(0, 0, 0);
-                createAlbumCards();
+                if (viewerRoot.classList.contains('active')) createAlbumCards();
                 resizeViewer();
                 renderViewer();
             } catch (error) {
@@ -2887,20 +3041,26 @@
 
         viewerCanvas.addEventListener('pointerdown', (event) => {
             dragging = true; lastX = event.clientX; lastY = event.clientY;
+            lastInteractionTime = performance.now();
             viewerCanvas.setPointerCapture(event.pointerId);
         });
         viewerCanvas.addEventListener('pointermove', (event) => {
             if (!dragging) return;
             const dx = event.clientX - lastX, dy = event.clientY - lastY;
             lastX = event.clientX; lastY = event.clientY;
+            lastInteractionTime = performance.now();
             targetYaw -= dx * .0045;
             targetPitch = THREE.MathUtils.clamp(targetPitch + dy * .0045, -Math.PI / 2 + .03, Math.PI / 2 - .03);
         });
-        const stopDrag = () => { dragging = false; };
+        const stopDrag = () => {
+            dragging = false;
+            lastInteractionTime = performance.now();
+        };
         viewerCanvas.addEventListener('pointerup', stopDrag);
         viewerCanvas.addEventListener('pointercancel', stopDrag);
         viewerCanvas.addEventListener('wheel', (event) => {
             event.preventDefault();
+            lastInteractionTime = performance.now();
             camera.fov = THREE.MathUtils.clamp(camera.fov + event.deltaY * .035, 35, 95);
             camera.updateProjectionMatrix();
         }, { passive: false });
@@ -2931,6 +3091,7 @@
 
         resetButton?.addEventListener('click', () => {
             targetYaw = 0; targetPitch = 0;
+            lastInteractionTime = performance.now();
             if (camera) { camera.fov = defaultFov; camera.updateProjectionMatrix(); }
         });
         fullscreenButton?.addEventListener('click', async () => {
