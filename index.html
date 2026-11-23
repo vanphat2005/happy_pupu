@@ -3000,7 +3000,7 @@
             const width = Math.max(1, viewerRoot.clientWidth);
             const height = Math.max(1, viewerRoot.clientHeight);
             renderer.setSize(width, height, false);
-            const maxPixelRatio = window.innerWidth <= 768 ? 1.25 : 2;
+            const maxPixelRatio = window.innerWidth <= 768 ? 1.5 : 2;
             renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
             camera.aspect = width / height;
             camera.updateProjectionMatrix();
@@ -3042,7 +3042,7 @@
                     premultipliedAlpha: false
                 });
                 renderer.setClearColor(0x000000, 0);
-                const maxPixelRatio = window.innerWidth <= 768 ? 1.25 : 2;
+                const maxPixelRatio = window.innerWidth <= 768 ? 1.75 : 2;
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
                 renderer.outputColorSpace = THREE.SRGBColorSpace;
                 scene = new THREE.Scene();
