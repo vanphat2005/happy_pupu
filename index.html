@@ -2607,7 +2607,7 @@
                         doorStage.style.transition = 'opacity 0.5s ease';
                     }
                     if (memorySphere && typeof memorySphere.activate === 'function') {
-                        memorySphere.activate();
+                        window.setTimeout(() => memorySphere.activate(), 200);
                     }
                 }, 2050);
             } else {
@@ -2730,34 +2730,46 @@
             return sprite;
         }
 
-        function makeIconSprite(symbol) {
-            const c = document.createElement('canvas');
-            c.width = 128; c.height = 128;
-            const g = c.getContext('2d');
-            g.font = '82px serif';
-            g.textAlign = 'center';
-            g.textBaseline = 'middle';
-            g.fillText(symbol, 64, 67);
-            const texture = new THREE.CanvasTexture(c);
-            texture.colorSpace = THREE.SRGBColorSpace;
-            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-                map: texture,
-                transparent: true,
-                depthWrite: false
-            }));
-            sprite.scale.set(38, 38, 1);
-            return sprite;
-        }
-
         function createAlbumCards() {
             if (!scene) return;
             if (albumGroup) scene.remove(albumGroup);
             albumGroup = new THREE.Group();
             albumPhotoMeshes = [];
 
-            const photoUrls = ['image/chibidangtruoc.png', 'image/chibidangsau.png'];
+            const photoUrls = [
+                'image/pu1.JPG',
+                'image/pu2.jpg',
+                'image/pu3.JPG',
+                'image/pu4.JPG',
+                'image/pu5.JPG',
+                'image/pu6.JPG',
+                'image/pu7.JPG',
+                'image/pu8.JPG',
+                'image/pu9.JPG',
+                'image/pu10.jpeg',
+                'image/pu11.JPG',
+                'image/pu12.JPG',
+                'image/pu13.JPG',
+                'image/pu14.jpeg',
+                'image/pu15.JPG',
+                'image/pu16.jpeg',
+                'image/pu17.jpeg',
+                'image/pu18.JPG',
+                'image/pu19.JPG',
+                'image/pu20.JPG'
+            ];
             const loader = new THREE.TextureLoader();
-            const cardCount = 32;
+            const stickerUrls = ['sticker/gaudau.png', 'sticker/socola.png'];
+            const stickerTextures = stickerUrls.map((url) => loader.load(
+                url,
+                (texture) => {
+                    texture.colorSpace = THREE.SRGBColorSpace;
+                    texture.needsUpdate = true;
+                },
+                undefined,
+                (error) => console.error(`Không tải được ảnh trang trí "${url}":`, error)
+            ));
+            const cardCount = photoUrls.length;
             albumAnimations = [];
             albumAnimationStart = performance.now();
             lastInteractionTime = albumAnimationStart;
@@ -2850,7 +2862,7 @@
                     texture.colorSpace = THREE.SRGBColorSpace;
                     photo.material.map = texture;
                     photo.material.needsUpdate = true;
-                });
+                }, undefined, (error) => console.error(`Không tải được ảnh gallery "${photoUrl}":`, error));
             }
 
             const notes = [
@@ -2899,30 +2911,35 @@
                 });
             });
 
-            const symbols = ['♡', '✿', '⭐', '✦', '🎀', '🐱', '💌', '🌸'];
-            symbols.forEach((symbol, index) => {
-                const longitude = index * Math.PI * 2 / symbols.length + 0.35;
+            const stickerCount = 8;
+            for (let index = 0; index < stickerCount; index++) {
+                const longitude = index * Math.PI * 2 / stickerCount + 0.35;
                 const latitude = (index % 2 ? -0.54 : 0.42) + (index % 3) * 0.16;
                 const position = new THREE.Vector3(
                     365 * Math.cos(latitude) * Math.cos(longitude),
                     365 * Math.sin(latitude),
                     365 * Math.cos(latitude) * Math.sin(longitude)
                 );
-                const icon = makeIconSprite(symbol);
-                icon.position.copy(position);
-                icon.lookAt(0, 0, 0);
-                const targetQuaternion = icon.quaternion.clone();
+                const sticker = new THREE.Sprite(new THREE.SpriteMaterial({
+                    map: stickerTextures[index % stickerTextures.length],
+                    transparent: true,
+                    depthWrite: false,
+                    opacity: 0
+                }));
+                sticker.scale.set(64, 106, 1);
+                sticker.position.copy(position);
+                sticker.lookAt(0, 0, 0);
+                const targetQuaternion = sticker.quaternion.clone();
                 const start = new THREE.Vector3(0, 0, -760);
-                icon.position.copy(start);
-                icon.quaternion.copy(targetQuaternion);
-                icon.rotateZ((index % 2 ? 1 : -1) * 0.28);
-                const startQuaternion = icon.quaternion.clone();
-                const targetScale = icon.scale.clone();
-                icon.scale.setScalar(0.015);
-                icon.material.opacity = 0;
-                albumGroup.add(icon);
+                sticker.position.copy(start);
+                sticker.quaternion.copy(targetQuaternion);
+                sticker.rotateZ((index % 2 ? 1 : -1) * 0.28);
+                const startQuaternion = sticker.quaternion.clone();
+                const targetScale = sticker.scale.clone();
+                sticker.scale.setScalar(0.015);
+                albumGroup.add(sticker);
                 albumAnimations.push({
-                    object: icon,
+                    object: sticker,
                     start,
                     target: position,
                     curve: new THREE.Vector3((index % 2 ? -1 : 1) * 60, -26, 18),
@@ -2933,7 +2950,7 @@
                     startScale: 0.015,
                     targetScale
                 });
-            });
+            }
 
             scene.add(albumGroup);
         }
