@@ -1642,7 +1642,7 @@
 
         let width = window.innerWidth;
         let height = window.innerHeight;
-        let dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth <= 700 ? 1.25 : 1.75);
+        let dpr = Math.min(window.devicePixelRatio || 1, 2);
 
         // Trạng thái điều khiển
         const state = {
@@ -1696,7 +1696,7 @@
         function resizeCanvas() {
             width = window.innerWidth;
             height = window.innerHeight;
-            dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth <= 700 ? 1.25 : 1.75);
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
             canvas.width = Math.floor(width * dpr);
             canvas.height = Math.floor(height * dpr);
             canvas.style.width = width + 'px';
@@ -1708,9 +1708,7 @@
            - 50% tạo thành dải Ngân Hà chéo vắt ngang màn hình + cụm sao xoắn ốc
            - 50% phân bố sâu khắp nền trời đen tuyền với nhiều lớp parallax */
         function generateGalaxyStars() {
-            const total = window.innerWidth <= 700
-                ? Math.min(DENSITY_MAP[state.density], 1500)
-                : DENSITY_MAP[state.density];
+            const total = DENSITY_MAP[state.density];
             stars = new Array(total);
             const diag = Math.hypot(width, height);
             const tilt = -0.48; // Góc nghiêng dải Ngân Hà chéo vắt ngang màn hình
@@ -1873,9 +1871,7 @@
             const nearCursorStars = [];
             const connectRadiusSq = 155 * 155;
 
-            const starStep = state.entering
-                ? (window.innerWidth <= 700 ? 8 : 4)
-                : 1;
+            const starStep = state.entering ? 4 : 1;
             for (let i = 0; i < stars.length; i += starStep) {
                 const s = stars[i];
 
@@ -2611,7 +2607,7 @@
                         doorStage.style.transition = 'opacity 0.5s ease';
                     }
                     if (memorySphere && typeof memorySphere.activate === 'function') {
-                        window.setTimeout(() => memorySphere.activate(), 520);
+                        memorySphere.activate();
                     }
                 }, 2050);
             } else {
@@ -2664,7 +2660,6 @@
         const idleRotateSpeed = 0.035;
         let activeObjectUrl = null;
         const defaultFov = 75;
-        let fallbackCardTexture = null;
 
         function applyPanoramaTexture(texture) {
             texture.colorSpace = THREE.SRGBColorSpace;
@@ -2682,30 +2677,29 @@
             }
         }
 
-        function makeFallbackCardTexture() {
-            if (fallbackCardTexture) return fallbackCardTexture;
+        function makeFallbackCardTexture(index) {
             const c = document.createElement('canvas');
-            c.width = 256; c.height = 320;
+            c.width = 512; c.height = 640;
             const g = c.getContext('2d');
             const gradient = g.createLinearGradient(0, 0, c.width, c.height);
-            gradient.addColorStop(0, '#5d6fa8');
+            gradient.addColorStop(0, index % 2 ? '#5d6fa8' : '#b7839d');
             gradient.addColorStop(.55, '#17203d');
             gradient.addColorStop(1, '#080b17');
             g.fillStyle = gradient;
             g.fillRect(0, 0, c.width, c.height);
             g.fillStyle = 'rgba(255,255,255,.82)';
-            g.beginPath(); g.arc(128, 128, 43, 0, Math.PI * 2); g.fill();
+            g.beginPath(); g.arc(256, 255, 86, 0, Math.PI * 2); g.fill();
             g.fillStyle = '#d99ab3';
-            g.beginPath(); g.arc(128, 128, 34, 0, Math.PI * 2); g.fill();
+            g.beginPath(); g.arc(256, 255, 68, 0, Math.PI * 2); g.fill();
             g.fillStyle = '#fff';
-            g.font = '700 21px Inter, sans-serif';
+            g.font = '700 42px Inter, sans-serif';
             g.textAlign = 'center';
-            g.fillText('MEMORY', 128, 215);
-            g.font = '700 12px JetBrains Mono, monospace';
-            g.fillText('360 // GALAXY', 128, 240);
-            fallbackCardTexture = new THREE.CanvasTexture(c);
-            fallbackCardTexture.colorSpace = THREE.SRGBColorSpace;
-            return fallbackCardTexture;
+            g.fillText('MEMORY', 256, 430);
+            g.font = '700 24px JetBrains Mono, monospace';
+            g.fillText(`${String(index + 1).padStart(2, '0')} // 360`, 256, 478);
+            const texture = new THREE.CanvasTexture(c);
+            texture.colorSpace = THREE.SRGBColorSpace;
+            return texture;
         }
 
         function makeLabelSprite(text, foreground = '#dc6f95') {
@@ -2763,7 +2757,7 @@
 
             const photoUrls = ['image/chibidangtruoc.png', 'image/chibidangsau.png'];
             const loader = new THREE.TextureLoader();
-            const cardCount = window.innerWidth <= 700 ? 20 : 32;
+            const cardCount = 32;
             albumAnimations = [];
             albumAnimationStart = performance.now();
             lastInteractionTime = albumAnimationStart;
@@ -2823,7 +2817,7 @@
                 const photo = new THREE.Mesh(
                     new THREE.PlaneGeometry(62, 80),
                     new THREE.MeshBasicMaterial({
-                        map: makeFallbackCardTexture(),
+                        map: makeFallbackCardTexture(index),
                         side: THREE.DoubleSide,
                         transparent: true,
                         opacity: 0,
@@ -2832,13 +2826,11 @@
                 );
                 photo.position.z = 0.5;
                 photo.rotateZ(((index % 5) - 2) * 0.018);
-                photo.userData.photoUrl = photoUrls[index % photoUrls.length];
                 card.add(photo);
                 albumPhotoMeshes.push(photo);
                 albumGroup.add(card);
                 albumAnimations.push({
                     object: card,
-                    materials: [frame.material, photo.material],
                     start,
                     target: position.clone(),
                     curve: new THREE.Vector3(
@@ -2853,20 +2845,13 @@
                     startScale: index === 0 ? 0.045 : 0.025
                 });
 
-            }
-
-            photoUrls.forEach((photoUrl) => {
+                const photoUrl = photoUrls[index % photoUrls.length];
                 loader.load(photoUrl, (texture) => {
                     texture.colorSpace = THREE.SRGBColorSpace;
-                    albumPhotoMeshes.forEach((photo) => {
-                        if (photo.userData.photoUrl !== photoUrl) return;
-                        photo.material.map = texture;
-                        photo.material.needsUpdate = true;
-                    });
-                }, undefined, (error) => {
-                    console.error(`Không tải được ảnh gallery ${photoUrl}:`, error);
+                    photo.material.map = texture;
+                    photo.material.needsUpdate = true;
                 });
-            });
+            }
 
             const notes = [
                 'Em luôn ở đây',
@@ -2902,7 +2887,6 @@
                 albumGroup.add(label);
                 albumAnimations.push({
                     object: label,
-                    materials: [label.material],
                     start,
                     target: position,
                     curve: new THREE.Vector3((index % 2 ? 1 : -1) * 42, 18, 12),
@@ -2939,7 +2923,6 @@
                 albumGroup.add(icon);
                 albumAnimations.push({
                     object: icon,
-                    materials: [icon.material],
                     start,
                     target: position,
                     curve: new THREE.Vector3((index % 2 ? -1 : 1) * 60, -26, 18),
@@ -2977,18 +2960,16 @@
                     );
                 }
 
+                const targetScale = animation.targetScale || new THREE.Vector3(1, 1, 1);
                 const scale = animation.startScale + (1 - animation.startScale) * flight;
-                if (animation.targetScale) {
-                    animation.object.scale.set(
-                        animation.targetScale.x * scale,
-                        animation.targetScale.y * scale,
-                        animation.targetScale.z * scale
-                    );
-                } else {
-                    animation.object.scale.setScalar(scale);
-                }
-                const opacity = THREE.MathUtils.clamp(progress * 1.8, 0, 1);
-                animation.materials.forEach((material) => { material.opacity = opacity; });
+                animation.object.scale.set(
+                    targetScale.x * scale,
+                    targetScale.y * scale,
+                    targetScale.z * scale
+                );
+                animation.object.traverse((child) => {
+                    if (child.material) child.material.opacity = THREE.MathUtils.clamp(progress * 1.8, 0, 1);
+                });
                 if (progress === 1) albumAnimations.splice(index, 1);
             }
         }
@@ -2998,8 +2979,7 @@
             const width = Math.max(1, viewerRoot.clientWidth);
             const height = Math.max(1, viewerRoot.clientHeight);
             renderer.setSize(width, height, false);
-            const maxPixelRatio = window.innerWidth <= 700 ? 1.25 : 1.75;
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
             camera.aspect = width / height;
             camera.updateProjectionMatrix();
         }
@@ -3027,7 +3007,6 @@
         }
 
         function initializeViewer() {
-            if (!viewerRoot.classList.contains('active')) return;
             if (renderer) {
                 resizeViewer();
                 if (viewerRoot.classList.contains('active') && !albumGroup) createAlbumCards();
@@ -3036,14 +3015,12 @@
             try {
                 renderer = new THREE.WebGLRenderer({
                     canvas: viewerCanvas,
-                    antialias: window.innerWidth > 700,
+                    antialias: true,
                     alpha: true,
-                    premultipliedAlpha: false,
-                    powerPreference: 'high-performance'
+                    premultipliedAlpha: false
                 });
                 renderer.setClearColor(0x000000, 0);
-                const maxPixelRatio = window.innerWidth <= 700 ? 1.25 : 1.75;
-                renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxPixelRatio));
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
                 renderer.outputColorSpace = THREE.SRGBColorSpace;
                 scene = new THREE.Scene();
                 camera = new THREE.PerspectiveCamera(defaultFov, 1, .1, 1100);
