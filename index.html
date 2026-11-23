@@ -1,0 +1,2352 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOCTIS // GALAXY — Bầu Trời Đen Tuyền Vô Tận</title>
+
+    <!-- Google Fonts: Space Grotesk, Inter, JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        space: ['Space Grotesk', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        obsidian: '#000000',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS: Obsidian Glassmorphism, Starlight Typography & Monochrome Celestial Graphics -->
+    <style>
+        html, body {
+            background-color: #000000;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Chỉ giữ lại nền sao canvas và cánh cửa trung tâm. */
+        body > :not(#galaxy-canvas):not(.door-experience) {
+            display: none !important;
+        }
+
+        #galaxy-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100vw !important;
+            height: 100vh !important;
+        }
+
+        .door-experience {
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            display: grid;
+            place-items: center;
+            pointer-events: none;
+        }
+
+        .door-stage {
+            position: relative;
+            width: min(50vw, 260px);
+            height: min(70vh, 460px);
+            min-width: 196px;
+            min-height: 340px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            filter: drop-shadow(0 20px 32px rgba(255, 170, 210, 0.16));
+        }
+
+        .door-frame {
+            position: absolute;
+            inset: 0;
+            border: clamp(10px, 2.4vw, 16px) solid #fff7fb;
+            border-bottom: 0;
+            border-radius: 48% 48% 4px 4px / 18% 18% 4px 4px;
+            background: linear-gradient(135deg, #ffdbe9 0%, #fffafb 48%, #ed9ab8 100%);
+            box-shadow:
+                0 0 0 3px #d98aa7,
+                0 0 22px rgba(255, 255, 255, 0.72),
+                inset 0 0 18px rgba(255, 255, 255, 0.8);
+        }
+
+        .door-frame::before,
+        .door-frame::after {
+            content: '';
+            position: absolute;
+            top: 8%;
+            bottom: -2px;
+            width: 8%;
+            background: linear-gradient(90deg, #d98aa7, #fff7fb 45%, #efbad0);
+            border-radius: 999px;
+        }
+
+        .door-frame::before { left: 4%; }
+        .door-frame::after { right: 4%; }
+
+        .door {
+            position: absolute;
+            left: 11%;
+            right: 11%;
+            bottom: 0;
+            height: calc(100% - 8%);
+            border: 2px solid rgba(255, 255, 255, 0.92);
+            border-bottom: 0;
+            border-radius: 46% 46% 2px 2px / 12% 12% 2px 2px;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.9) 0 3px, transparent 4px),
+                linear-gradient(145deg, #fff 0%, #fff7fb 38%, #f8bfd2 72%, #df94b1 100%);
+            box-shadow:
+                inset 0 0 26px rgba(255, 255, 255, 0.9),
+                inset 0 -16px 30px rgba(205, 108, 150, 0.18),
+                0 0 18px rgba(255, 202, 223, 0.7);
+        }
+
+        .door::before {
+            content: '';
+            position: absolute;
+            inset: 7%;
+            border: 2px solid rgba(223, 148, 177, 0.48);
+            border-radius: 44% 44% 2px 2px / 11% 11% 2px 2px;
+            box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.75);
+        }
+
+        .door::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 7%;
+            width: 18%;
+            aspect-ratio: 1;
+            transform: translateX(-50%);
+            border-radius: 50%;
+            background: radial-gradient(circle at 38% 35%, #fff 0 8%, #eeb0c9 9% 58%, #bc718f 100%);
+            border: 2px solid #fff;
+            box-shadow: 0 0 12px rgba(213, 121, 157, 0.7);
+        }
+
+        .door-panel {
+            position: absolute;
+            width: 44%;
+            height: 26%;
+            left: 28%;
+            top: 26%;
+            border: 2px solid rgba(220, 151, 177, 0.48);
+            border-radius: 50% 50% 8% 8%;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.78), rgba(255, 221, 234, 0.6));
+            box-shadow: inset 0 0 12px #fff;
+        }
+
+        .door-inside {
+            position: absolute;
+            inset: 7%;
+            z-index: 0;
+            border-radius: 44% 44% 2px 2px / 11% 11% 2px 2px;
+            background: #000000;
+            box-shadow:
+                inset 0 0 16px rgba(255, 255, 255, 0.16),
+                0 0 28px rgba(255, 255, 255, 0.12);
+            opacity: 0;
+            transition: opacity 0.8s ease 0.35s;
+        }
+
+        .door-panel-leaf {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            z-index: 3;
+            width: 50.2%;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.9) 0 3px, transparent 4px),
+                linear-gradient(145deg, #fff 0%, #fff7fb 38%, #f8bfd2 72%, #df94b1 100%);
+            border: 1px solid rgba(255, 255, 255, 0.92);
+            transition:
+                transform 1.35s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 1.35s ease;
+            backface-visibility: hidden;
+        }
+
+        .door-panel-leaf.left {
+            left: 0;
+            border-right: 1px solid rgba(205, 126, 158, 0.38);
+            border-radius: 46% 0 0 2px / 12% 0 2px 2px;
+            transform-origin: left center;
+        }
+
+        .door-panel-leaf.right {
+            right: 0;
+            border-left: 1px solid rgba(205, 126, 158, 0.38);
+            border-radius: 0 46% 2px 0 / 0 12% 2px 2px;
+            transform-origin: right center;
+        }
+
+        .door.is-opening .door-inside {
+            opacity: 1;
+        }
+
+        .door.is-opening .door-panel-leaf.left {
+            transform: perspective(900px) rotateY(-82deg);
+            filter: brightness(0.88);
+        }
+
+        .door.is-opening .door-panel-leaf.right {
+            transform: perspective(900px) rotateY(82deg);
+            filter: brightness(0.88);
+        }
+
+        .door-experience.entering {
+            overflow: hidden;
+            contain: layout paint;
+        }
+
+        .door-experience.entering .door-stage {
+            animation: enterDoor 1.05s cubic-bezier(0.22, 0.68, 0.12, 1) forwards;
+            will-change: transform, filter;
+        }
+
+        .door-experience.entering .chibi-character,
+        .door-experience.entering .flower,
+        .door-experience.entering .butterfly,
+        .door-experience.entering .side-star,
+        .door-experience.entering .crown-star {
+            animation-play-state: paused;
+        }
+
+        .door-experience.entering .chibi-character {
+            z-index: 20;
+            animation: chibiStepThrough 1.05s cubic-bezier(0.22, 0.68, 0.12, 1) forwards;
+            will-change: transform, opacity;
+        }
+
+        @keyframes chibiStepThrough {
+            0% { opacity: 1; transform: translateX(-50%) scale(1); }
+            42% { opacity: 1; transform: translateX(-50%) translateY(-2%) scale(1.08); }
+            78% { opacity: 0.75; transform: translateX(-50%) translateY(-8%) scale(0.42); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-10%) scale(0.08); }
+        }
+
+        @keyframes enterDoor {
+            0% { transform: scale(1) translateY(0); }
+            28% { transform: scale(1.12) translateY(-1%); }
+            58% { transform: scale(2.15) translateY(-2%); filter: brightness(1.12); }
+            100% { transform: scale(5.8) translateY(-4%); filter: brightness(1.5); }
+        }
+
+        .door-tunnel {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            z-index: 29;
+            width: 20px;
+            height: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, -50%) scale(0);
+            border-radius: 50%;
+            background:
+                radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 2%, rgba(255, 220, 238, 0.75) 8%, rgba(255, 255, 255, 0.12) 36%, transparent 70%);
+            box-shadow:
+                0 0 35px rgba(255, 255, 255, 0.78),
+                0 0 90px rgba(255, 185, 215, 0.48);
+            will-change: transform, opacity;
+        }
+
+        .door-tunnel.active {
+            animation: doorwayTunnel 1.05s cubic-bezier(0.22, 0.68, 0.12, 1) forwards;
+        }
+
+        .door-tunnel::before,
+        .door-tunnel::after {
+            content: '';
+            position: absolute;
+            inset: -38%;
+            border: 1px solid rgba(255, 255, 255, 0.48);
+            border-radius: 50%;
+            animation: tunnelRing 0.8s ease-out 1;
+        }
+
+        .door-tunnel::after {
+            inset: -78%;
+            animation-delay: 0.28s;
+        }
+
+        @keyframes doorwayTunnel {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+            25% { opacity: 0.55; }
+            70% { opacity: 1; transform: translate(-50%, -50%) scale(18); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(42); }
+        }
+
+        @keyframes tunnelRing {
+            0% { opacity: 0.8; transform: scale(0.45); }
+            100% { opacity: 0; transform: scale(3.2); }
+        }
+
+        .door-warp-flare {
+            position: fixed;
+            inset: -12%;
+            z-index: 28;
+            opacity: 0;
+            pointer-events: none;
+            background:
+                repeating-conic-gradient(from 15deg at 50% 50%, transparent 0 3deg, rgba(255, 255, 255, 0.12) 3.2deg 3.6deg, transparent 4deg 7deg);
+            mask-image: radial-gradient(circle at 50% 50%, #000 0 3%, transparent 58%);
+            -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0 3%, transparent 58%);
+        }
+
+        .door-warp-flare.active {
+            animation: warpFlare 0.95s ease-out forwards;
+        }
+
+        @keyframes warpFlare {
+            0% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+            35% { opacity: 0.7; }
+            100% { opacity: 0; transform: scale(2.4) rotate(28deg); }
+        }
+
+        .flower {
+            position: absolute;
+            width: 34px;
+            height: 34px;
+            z-index: 4;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 3px 5px rgba(152, 79, 112, 0.28));
+        }
+
+        .flower::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 8px;
+            height: 8px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: #fff8bf;
+            box-shadow: 0 0 7px #fff;
+        }
+
+        .petal {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 12px;
+            height: 17px;
+            transform-origin: 50% 100%;
+            border-radius: 70% 70% 55% 55%;
+            background: linear-gradient(180deg, #fff 0%, #ffd1e3 100%);
+            border: 1px solid rgba(223, 147, 177, 0.38);
+        }
+
+        .petal:nth-child(1) { transform: translate(-50%, -100%) rotate(0deg) translateY(-3px); }
+        .petal:nth-child(2) { transform: translate(-50%, -100%) rotate(72deg) translateY(-3px); }
+        .petal:nth-child(3) { transform: translate(-50%, -100%) rotate(144deg) translateY(-3px); }
+        .petal:nth-child(4) { transform: translate(-50%, -100%) rotate(216deg) translateY(-3px); }
+        .petal:nth-child(5) { transform: translate(-50%, -100%) rotate(288deg) translateY(-3px); }
+
+        .flower.f1 { left: 6%; top: 18%; }
+        .flower.f2 { right: -2%; top: 12%; transform: translate(-50%, -50%) scale(0.82); }
+        .flower.f3 { left: 3%; bottom: 12%; transform: translate(-50%, -50%) scale(0.72); }
+        .flower.f4 { right: -5%; bottom: 19%; transform: translate(-50%, -50%) scale(0.78); }
+
+        .crown-star,
+        .side-star {
+            position: absolute;
+            z-index: 6;
+            color: #fff;
+            text-shadow: 0 0 8px #ffc1dc, 0 0 16px #fff;
+            animation: starTwinkle 2.4s ease-in-out infinite;
+        }
+
+        .crown-star {
+            left: 50%;
+            top: -6%;
+            font-size: 26px;
+            transform: translateX(-50%);
+        }
+
+        .side-star {
+            font-size: 14px;
+        }
+
+        .side-star.s1 { left: -4%; top: 34%; }
+        .side-star.s2 { right: -5%; top: 48%; animation-delay: 0.7s; }
+        .side-star.s3 { left: 10%; bottom: 3%; animation-delay: 1.2s; }
+        .side-star.s4 { right: 8%; bottom: 0; animation-delay: 1.7s; }
+
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 0.72; transform: scale(0.86) rotate(8deg); }
+            50% { opacity: 1; transform: scale(1.16) rotate(-8deg); }
+        }
+
+        .door-podium {
+            position: absolute;
+            left: 50%;
+            bottom: -13%;
+            z-index: 8;
+            width: 116%;
+            height: 14%;
+            transform: translateX(-50%);
+            border-radius: 50% 50% 12% 12% / 24% 24% 18% 18%;
+            background:
+                radial-gradient(ellipse at 50% 8%, #fff 0 28%, #fdfafd 58%, #efbdcf 100%);
+            border: 2px solid rgba(255, 255, 255, 0.95);
+            box-shadow:
+                0 12px 22px rgba(230, 154, 184, 0.24),
+                0 0 18px rgba(255, 255, 255, 0.42),
+                inset 0 8px 12px rgba(255, 255, 255, 0.95);
+        }
+
+        .door-podium::after {
+            content: '';
+            position: absolute;
+            left: 8%;
+            right: 8%;
+            bottom: -38%;
+            height: 52%;
+            border-radius: 0 0 50% 50% / 0 0 70% 70%;
+            background: linear-gradient(180deg, #fff7fa 0%, #edb4c9 100%);
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 16px rgba(190, 104, 139, 0.16);
+        }
+
+        .chibi-character {
+            position: absolute;
+            left: -42%;
+            bottom: -12%;
+            z-index: 11;
+            width: clamp(170px, 52vw, 240px);
+            max-height: 74%;
+            object-fit: contain;
+            object-position: bottom center;
+            filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.28));
+            transform-origin: bottom center;
+            animation: chibiSway 3.6s ease-in-out infinite;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .chibi-character.walking-to-door {
+            left: 50%;
+            bottom: -15%;
+            z-index: 18;
+            width: clamp(270px, 74vw, 360px);
+            max-height: none;
+            height: auto;
+            transform: translateX(-50%);
+            animation: chibiWalkToDoor 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .chibi-character.at-door {
+            left: 50%;
+            bottom: -15%;
+            z-index: 18;
+            width: clamp(270px, 74vw, 360px);
+            max-height: none;
+            height: auto;
+            transform: translateX(-50%);
+            animation: chibiSwayAtDoor 3.6s ease-in-out infinite;
+        }
+
+        .door-guide-button {
+            position: absolute;
+            left: 50%;
+            bottom: 22%;
+            z-index: 25;
+            width: clamp(58px, 18vw, 78px);
+            aspect-ratio: 1;
+            transform: translateX(-50%);
+            border: 2px solid rgba(255, 255, 255, 0.82);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.16);
+            box-shadow:
+                0 0 18px rgba(255, 255, 255, 0.42),
+                inset 0 0 16px rgba(255, 255, 255, 0.28);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            cursor: pointer;
+            pointer-events: auto;
+            animation: guidePulse 1.8s ease-in-out infinite;
+        }
+
+        .door-guide-button::before,
+        .door-guide-button::after {
+            content: '';
+            position: absolute;
+            inset: 12%;
+            border: 1px solid rgba(255, 255, 255, 0.62);
+            border-radius: 50%;
+        }
+
+        .door-guide-button::after {
+            inset: 34%;
+            background: rgba(255, 255, 255, 0.78);
+            box-shadow: 0 0 8px #fff;
+        }
+
+        .door-guide-button.used {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .door-fog {
+            position: fixed;
+            inset: 0;
+            z-index: 30;
+            opacity: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 50% 58%, rgba(255, 255, 255, 0.10), transparent 20%),
+                linear-gradient(180deg, rgba(255, 220, 236, 0.08), rgba(255, 255, 255, 0.15));
+            transition: opacity 0.8s ease;
+        }
+
+        .door-fog.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .door-fog.clearing {
+            opacity: 0;
+        }
+
+        .pin-lock {
+            position: fixed;
+            left: 50%;
+            bottom: 7%;
+            z-index: 40;
+            width: min(92vw, 410px);
+            transform: translate(-50%, 22px) scale(0.96);
+            opacity: 0;
+            pointer-events: none;
+            padding: 18px 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.78);
+            border-radius: 24px;
+            background: linear-gradient(145deg, rgba(255, 247, 251, 0.96), rgba(255, 210, 229, 0.92));
+            box-shadow:
+                0 18px 38px rgba(88, 42, 64, 0.32),
+                0 0 22px rgba(255, 255, 255, 0.55),
+                inset 0 1px 0 #fff;
+            text-align: center;
+            transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .pin-lock.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, 0) scale(1);
+        }
+
+        .lock-icon {
+            position: relative;
+            width: 54px;
+            height: 42px;
+            margin: 0 auto 10px;
+            border: 3px solid #fff;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #f6abc6, #c76f97);
+            box-shadow: 0 5px 14px rgba(176, 93, 130, 0.35), inset 0 1px 4px #fff;
+        }
+
+        .lock-icon::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 31px;
+            width: 32px;
+            height: 30px;
+            transform: translateX(-50%);
+            border: 5px solid #fff;
+            border-bottom: 0;
+            border-radius: 18px 18px 0 0;
+            box-sizing: border-box;
+        }
+
+        .lock-icon::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 13px;
+            width: 6px;
+            height: 10px;
+            transform: translateX(-50%);
+            border-radius: 999px;
+            background: #fff;
+            box-shadow: 0 5px 0 #a95f7e;
+        }
+
+        .pin-title {
+            margin: 0 0 10px;
+            color: #8f5570;
+            font: 600 13px/1.2 'Inter', sans-serif;
+            letter-spacing: 0.12em;
+        }
+
+        .pin-inputs {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: clamp(4px, 1.2vw, 8px);
+        }
+
+        .pin-inputs input {
+            width: 100%;
+            min-width: 0;
+            height: 48px;
+            border: 1px solid rgba(180, 98, 135, 0.38);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.86);
+            color: #7d455d;
+            box-shadow: inset 0 2px 5px rgba(180, 98, 135, 0.08);
+            text-align: center;
+            font: 700 18px 'JetBrains Mono', monospace;
+            outline: none;
+        }
+
+        .pin-inputs input:focus {
+            border-color: #cf789e;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.8), 0 0 10px rgba(207, 120, 158, 0.4);
+        }
+
+        .pin-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 7px;
+            width: min(74%, 230px);
+            margin: 10px auto 0;
+        }
+
+        .pin-key {
+            height: 42px;
+            border: 1px solid rgba(180, 98, 135, 0.28);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.82);
+            color: #7d455d;
+            box-shadow: 0 4px 9px rgba(180, 98, 135, 0.12), inset 0 1px 0 #fff;
+            font: 700 17px 'JetBrains Mono', monospace;
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .pin-key:active {
+            transform: scale(0.94);
+            background: #fff;
+        }
+
+        .pin-key.delete-key {
+            color: #a95f7e;
+            font-size: 20px;
+        }
+
+        .pin-lock.shake {
+            animation: pinShake 0.38s ease;
+        }
+
+        .pin-status {
+            min-height: 18px;
+            margin: 8px 0 0;
+            color: #9d5d79;
+            font: 500 11px/1.2 'Inter', sans-serif;
+        }
+
+        .pin-lock.unlocked {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(220, 255, 238, 0.92));
+        }
+
+        @keyframes pinShake {
+            0%, 100% { transform: translate(-50%, 0) translateX(0); }
+            25% { transform: translate(-50%, 0) translateX(-8px); }
+            75% { transform: translate(-50%, 0) translateX(8px); }
+        }
+
+        .butterfly {
+            position: absolute;
+            z-index: 9;
+            width: 28px;
+            height: 24px;
+            animation: butterflyFloat 4.8s ease-in-out infinite;
+            filter: drop-shadow(0 3px 5px rgba(255, 177, 210, 0.38));
+        }
+
+        .butterfly::before,
+        .butterfly::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            width: 15px;
+            height: 19px;
+            background: linear-gradient(135deg, #fff 0%, #ffc1d8 38%, #ec7fa9 100%);
+            border: 1px solid rgba(255, 255, 255, 0.82);
+        }
+
+        .butterfly::before {
+            left: 0;
+            border-radius: 80% 38% 70% 42%;
+            transform-origin: right center;
+            animation: wingLeft 0.42s ease-in-out infinite alternate;
+        }
+
+        .butterfly::after {
+            right: 0;
+            border-radius: 38% 80% 42% 70%;
+            transform-origin: left center;
+            animation: wingRight 0.42s ease-in-out infinite alternate;
+        }
+
+        .butterfly-body {
+            position: absolute;
+            z-index: 3;
+            left: 50%;
+            top: 4px;
+            width: 3px;
+            height: 17px;
+            transform: translateX(-50%);
+            border-radius: 999px;
+            background: #a85f7c;
+        }
+
+        .butterfly-body::before,
+        .butterfly-body::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            width: 7px;
+            height: 8px;
+            border-top: 1px solid #a85f7c;
+            border-radius: 50%;
+        }
+
+        .butterfly-body::before {
+            left: -6px;
+            transform: rotate(32deg);
+        }
+
+        .butterfly-body::after {
+            right: -6px;
+            transform: rotate(-32deg);
+        }
+
+        .butterfly.b1 { left: -13%; top: 25%; }
+        .butterfly.b2 { right: -15%; top: 38%; animation-delay: -1.4s; transform: scale(0.82) rotate(12deg); }
+        .butterfly.b3 { left: -8%; bottom: 18%; animation-delay: -2.6s; transform: scale(0.68) rotate(-8deg); }
+        .butterfly.b4 { right: -8%; bottom: 8%; animation-delay: -3.3s; transform: scale(0.76) rotate(8deg); }
+
+        @keyframes butterflyFloat {
+            0%, 100% { margin-top: 0; }
+            50% { margin-top: -13px; }
+        }
+
+        @keyframes chibiSway {
+            0%, 100% { transform: rotate(-1deg) translateY(0); }
+            50% { transform: rotate(1deg) translateY(-4px); }
+        }
+
+        @keyframes chibiSwayAtDoor {
+            0%, 100% { transform: translateX(-50%) rotate(-1deg) translateY(0) scale(1); }
+            50% { transform: translateX(-50%) rotate(1deg) translateY(-4px) scale(1); }
+        }
+
+        @keyframes guidePulse {
+            0%, 100% {
+                transform: translateX(-50%) scale(0.92);
+                opacity: 0.72;
+            }
+            50% {
+                transform: translateX(-50%) scale(1.08);
+                opacity: 1;
+            }
+        }
+
+        @keyframes chibiWalkToDoor {
+            0% {
+                left: -42%;
+                bottom: -12%;
+                transform: translateX(0) rotate(-2deg) scale(0.94);
+            }
+            45% {
+                left: 5%;
+                bottom: -7%;
+                transform: translateX(0) rotate(2deg) scale(1);
+            }
+            100% {
+                left: 50%;
+                bottom: -15%;
+                transform: translateX(-50%) rotate(0) scale(1);
+            }
+        }
+
+        @keyframes wingLeft {
+            from { transform: perspective(30px) rotateY(8deg); }
+            to { transform: perspective(30px) rotateY(58deg); }
+        }
+
+        @keyframes wingRight {
+            from { transform: perspective(30px) rotateY(-8deg); }
+            to { transform: perspective(30px) rotateY(-58deg); }
+        }
+
+        @media (max-width: 600px) {
+            .door-stage {
+                width: min(60vw, 230px);
+                height: min(62vh, 410px);
+                min-width: 184px;
+                min-height: 310px;
+            }
+
+            .flower {
+                width: 29px;
+                height: 29px;
+            }
+
+            .butterfly {
+                width: 24px;
+                height: 21px;
+            }
+
+            .butterfly::before,
+            .butterfly::after {
+                width: 13px;
+                height: 17px;
+            }
+
+            .door-podium {
+                bottom: -11%;
+            }
+
+            .chibi-character {
+                left: -38%;
+                bottom: -9%;
+                width: clamp(138px, 48vw, 185px);
+            }
+
+            .chibi-character.walking-to-door {
+                width: clamp(240px, 84vw, 340px);
+                bottom: -12%;
+            }
+
+            .chibi-character.at-door {
+                width: clamp(240px, 84vw, 340px);
+            }
+
+            .door-guide-button {
+                width: clamp(54px, 16vw, 68px);
+                bottom: 20%;
+            }
+        }
+
+        /* Thanh cuộn tối giản đơn sắc */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.22);
+            border-radius: 999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.45);
+        }
+
+        /* Obsidian Glassmorphism */
+        .obsidian-glass {
+            background: rgba(0, 0, 0, 0.62);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .obsidian-glass-strong {
+            background: rgba(0, 0, 0, 0.80);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        /* Hiệu ứng chữ phát sáng trắng bạc tinh khiết */
+        .starlight-text {
+            text-shadow:
+                0 0 18px rgba(255, 255, 255, 0.35),
+                0 0 42px rgba(220, 238, 255, 0.18);
+        }
+
+        .starlight-subtle {
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.28);
+        }
+
+        /* Ẩn giao diện cho Chế độ Ngắm sao (Stargazing Mode) */
+        .ui-layer {
+            transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        body.stargazing-active .ui-layer {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+        }
+
+        body.stargazing-active #restore-ui-btn {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        #restore-ui-btn {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-10px);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+        }
+
+        /* Chuyển cảnh mượt khi chọn thiên thể */
+        .celestial-fade {
+            transition: opacity 0.28s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Animation xoay nhẹ cho đồ họa thiên thể SVG/CSS */
+        @keyframes spinVerySlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes spinReverseSlow {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+        @keyframes pulseStarlight {
+            0%, 100% { opacity: 0.72; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.06); }
+        }
+        @keyframes pulsarBeam {
+            0%, 100% { opacity: 0.35; transform: rotate(-28deg) scaleY(0.92); }
+            50% { opacity: 0.95; transform: rotate(-28deg) scaleY(1.08); }
+        }
+
+        .anim-spin-slow {
+            animation: spinVerySlow 38s linear infinite;
+        }
+        .anim-spin-rev {
+            animation: spinReverseSlow 52s linear infinite;
+        }
+        .anim-pulse-star {
+            animation: pulseStarlight 4s ease-in-out infinite;
+        }
+        .anim-pulsar {
+            animation: pulsarBeam 1.6s ease-in-out infinite;
+        }
+
+        /* Sóng âm thanh đơn sắc */
+        .mono-eq-bar {
+            width: 2.5px;
+            height: 5px;
+            border-radius: 999px;
+            background: #ffffff;
+            opacity: 0.45;
+            transition: height 0.2s ease, opacity 0.2s ease;
+        }
+        .audio-on .mono-eq-bar {
+            opacity: 0.95;
+            animation: monoEq 0.85s ease-in-out infinite alternate;
+        }
+        .audio-on .mono-eq-bar:nth-child(2) { animation-delay: 0.15s; }
+        .audio-on .mono-eq-bar:nth-child(3) { animation-delay: 0.3s; }
+        .audio-on .mono-eq-bar:nth-child(4) { animation-delay: 0.2s; }
+
+        @keyframes monoEq {
+            0% { height: 4px; }
+            100% { height: 15px; }
+        }
+    </style>
+</head>
+<body class="bg-black text-white antialiased selection:bg-white/20 selection:text-white">
+
+    <!-- ==================== NỀN THIÊN HÀ ĐEN TUYỀN HTML5 CANVAS ==================== -->
+    <canvas id="galaxy-canvas" class="fixed inset-0 w-full h-full z-0 block"></canvas>
+
+    <div class="door-experience" aria-label="Cánh cửa trang trí">
+        <div class="door-stage">
+            <img class="chibi-character" src="image/chibidangtruoc.png" alt="Nhân vật chibi">
+            <button class="door-guide-button" type="button" aria-label="Mời chibi đến cửa"></button>
+            <span class="crown-star">✦</span>
+            <span class="side-star s1">✦</span>
+            <span class="side-star s2">✦</span>
+            <span class="side-star s3">✦</span>
+            <span class="side-star s4">✦</span>
+
+            <div class="door-frame">
+                <div class="door">
+                    <div class="door-panel"></div>
+                    <div class="door-inside"></div>
+                    <div class="door-panel-leaf left"></div>
+                    <div class="door-panel-leaf right"></div>
+                </div>
+            </div>
+            <div class="door-podium"></div>
+
+            <div class="flower f1">
+                <span class="petal"></span><span class="petal"></span><span class="petal"></span>
+                <span class="petal"></span><span class="petal"></span>
+            </div>
+            <div class="flower f2">
+                <span class="petal"></span><span class="petal"></span><span class="petal"></span>
+                <span class="petal"></span><span class="petal"></span>
+            </div>
+            <div class="flower f3">
+                <span class="petal"></span><span class="petal"></span><span class="petal"></span>
+                <span class="petal"></span><span class="petal"></span>
+            </div>
+            <div class="flower f4">
+                <span class="petal"></span><span class="petal"></span><span class="petal"></span>
+                <span class="petal"></span><span class="petal"></span>
+            </div>
+
+            <div class="butterfly b1"><span class="butterfly-body"></span></div>
+            <div class="butterfly b2"><span class="butterfly-body"></span></div>
+            <div class="butterfly b3"><span class="butterfly-body"></span></div>
+            <div class="butterfly b4"><span class="butterfly-body"></span></div>
+        </div>
+
+        <div class="door-fog" aria-hidden="true"></div>
+        <div class="door-tunnel" aria-hidden="true"></div>
+        <div class="door-warp-flare" aria-hidden="true"></div>
+        <div class="pin-lock" role="dialog" aria-modal="true" aria-label="Ổ khóa mật khẩu">
+            <div class="lock-icon" aria-hidden="true"></div>
+            <p class="pin-title">NHẬP MẬT KHẨU 8 SỐ</p>
+            <div class="pin-inputs">
+                <input maxlength="1" readonly aria-label="Số 1" autocomplete="off">
+                <input maxlength="1" readonly aria-label="Số 2" autocomplete="off">
+                <input maxlength="1" readonly aria-label="Số 3" autocomplete="off">
+                <input maxlength="1" readonly aria-label="Số 4" autocomplete="off">
+                <input maxlength="1" readonly aria-label="Số 5" autocomplete="off">
+                <input maxlength="1" readonly aria-label="Số 6" autocomplete="off">
+                <input maxlength="1" readonly aria-label="Số 7" autocomplete="off">
+                <input maxlength="1" readonly aria-label="Số 8" autocomplete="off">
+            </div>
+            <div class="pin-pad" aria-label="Bàn phím số">
+                <button class="pin-key" type="button" data-digit="1">1</button>
+                <button class="pin-key" type="button" data-digit="2">2</button>
+                <button class="pin-key" type="button" data-digit="3">3</button>
+                <button class="pin-key" type="button" data-digit="4">4</button>
+                <button class="pin-key" type="button" data-digit="5">5</button>
+                <button class="pin-key" type="button" data-digit="6">6</button>
+                <button class="pin-key" type="button" data-digit="7">7</button>
+                <button class="pin-key" type="button" data-digit="8">8</button>
+                <button class="pin-key" type="button" data-digit="9">9</button>
+                <button class="pin-key" type="button" data-clear="all">C</button>
+                <button class="pin-key" type="button" data-digit="0">0</button>
+                <button class="pin-key delete-key" type="button" data-delete="one" aria-label="Xóa số">&#x232B;</button>
+            </div>
+            <p class="pin-status" aria-live="polite"></p>
+        </div>
+    </div>
+
+    <!-- Nút khôi phục giao diện khi đang ở Chế độ Ngắm sao -->
+    <button id="restore-ui-btn" onclick="toggleStargazingMode(false)"
+        class="fixed top-5 right-5 z-50 obsidian-glass-strong px-4 py-2.5 rounded-full text-xs font-mono tracking-wider text-white/90 hover:text-white hover:border-white/40 flex items-center gap-2.5 cursor-pointer shadow-[0_0_25px_rgba(255,255,255,0.1)]">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        </svg>
+        <span>HIỆN GIAO DIỆN</span>
+    </button>
+
+    <!-- ==================== THANH ĐIỀU HƯỚNG TỐI GIẢN ==================== -->
+    <header class="ui-layer fixed top-0 left-0 right-0 z-40 obsidian-glass border-t-0 border-x-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-18">
+                <!-- Logo phát sáng trắng -->
+                <a href="#overview" class="flex items-center gap-3 group">
+                    <span class="relative flex items-center justify-center w-8 h-8 rounded-full border border-white/25 bg-black group-hover:border-white/60 transition-colors">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_10px_#ffffff]"></span>
+                        <span class="absolute w-5 h-[1px] bg-white/50"></span>
+                        <span class="absolute h-5 w-[1px] bg-white/50"></span>
+                    </span>
+                    <span class="font-space font-semibold text-sm sm:text-base tracking-[0.22em] text-white starlight-subtle">
+                        NOCTIS <span class="text-white/40">//</span> GALAXY
+                    </span>
+                </a>
+
+                <!-- Menu Desktop -->
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="#overview" class="px-4 py-2 rounded-full text-xs font-mono tracking-wider text-white/70 hover:text-white hover:bg-white/5 transition-all uppercase">Tổng quan</a>
+                    <a href="#celestial" class="px-4 py-2 rounded-full text-xs font-mono tracking-wider text-white/70 hover:text-white hover:bg-white/5 transition-all uppercase">Thiên thể</a>
+                    <a href="#observatory" class="px-4 py-2 rounded-full text-xs font-mono tracking-wider text-white/70 hover:text-white hover:bg-white/5 transition-all uppercase">Đài quan sát</a>
+                </nav>
+
+                <!-- Nút Ẩn giao diện (Ngắm sao) & Menu Mobile -->
+                <div class="flex items-center gap-2.5">
+                    <button onclick="toggleStargazingMode(true)"
+                        class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-mono tracking-wider border border-white/20 bg-white/[0.04] text-white/90 hover:bg-white hover:text-black transition-all cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                        </svg>
+                        <span class="hidden sm:inline">Ẩn giao diện (Ngắm sao)</span>
+                        <span class="sm:hidden">Ngắm sao</span>
+                    </button>
+
+                    <button id="mobile-menu-btn" aria-label="Menu" class="md:hidden p-2 rounded-full border border-white/15 bg-black/70 text-white/80 hover:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7h16M4 12h16M4 17h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Mobile -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-white/10 bg-black/95 px-4 py-3 space-y-1">
+            <a href="#overview" class="mobile-link block px-4 py-2.5 rounded-xl text-xs font-mono tracking-wider text-white/80 hover:bg-white/10 uppercase">Tổng quan</a>
+            <a href="#celestial" class="mobile-link block px-4 py-2.5 rounded-xl text-xs font-mono tracking-wider text-white/80 hover:bg-white/10 uppercase">Thiên thể</a>
+            <a href="#observatory" class="mobile-link block px-4 py-2.5 rounded-xl text-xs font-mono tracking-wider text-white/80 hover:bg-white/10 uppercase">Đài quan sát</a>
+        </div>
+    </header>
+
+    <!-- ==================== NỘI DUNG CHÍNH ==================== -->
+    <main class="ui-layer relative z-10 pt-20 pb-36 sm:pb-32">
+
+        <!-- ==================== 1. KHU VỰC HERO TỐI GIẢN ==================== -->
+        <section id="overview" class="min-h-[86vh] flex items-center justify-center px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto text-center space-y-8">
+
+                <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full obsidian-glass text-[11px] font-mono tracking-[0.22em] text-white/75 uppercase">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                    <span id="hero-star-count-badge">2.800 NGÔI SAO ĐANG HIỂN THỊ // 60 FPS</span>
+                </div>
+
+                <h1 class="font-space font-bold text-4xl sm:text-6xl lg:text-7xl tracking-tight leading-[1.08] text-white starlight-text">
+                    TĨNH LẶNG TRONG <br>
+                    <span class="bg-gradient-to-b from-white via-slate-200 to-slate-500 bg-clip-text text-transparent">
+                        BIỂN SAO VÔ CỰC
+                    </span>
+                </h1>
+
+                <p class="text-slate-300/85 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed font-light">
+                    Khoảng không đen tuyền tuyệt đối nơi hàng nghìn vì sao sắc nét xoay chậm theo dải Ngân Hà.
+                    Di chuyển con trỏ để cảm nhận chiều sâu vũ trụ, kết nối các chòm sao hoặc kích hoạt bước nhảy ánh sáng.
+                </p>
+
+                <!-- Các nút hành động chính -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+                    <button id="hero-warp-btn" onclick="toggleWarp()"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-full font-mono text-xs sm:text-sm font-medium tracking-wider bg-white text-black hover:bg-slate-200 shadow-[0_0_30px_rgba(255,255,255,0.28)] transition-all active:scale-95 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        <span id="hero-warp-text">BƯỚC NHẢY ÁNH SÁNG (WARP)</span>
+                    </button>
+
+                    <button onclick="toggleStargazingMode(true)"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full font-mono text-xs sm:text-sm tracking-wider text-white obsidian-glass hover:border-white/40 hover:bg-white/10 transition-all cursor-pointer">
+                        <svg class="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                        </svg>
+                        <span>CHẾ ĐỘ NGẮM SAO</span>
+                    </button>
+                </div>
+
+                <!-- Thông số thiên văn tối giản -->
+                <div class="grid grid-cols-3 gap-3 sm:gap-6 max-w-xl mx-auto pt-8 border-t border-white/10">
+                    <div>
+                        <p class="text-[10px] font-mono tracking-[0.2em] text-white/45 uppercase">Tâm Thiên Hà</p>
+                        <p class="font-mono text-sm sm:text-base text-white/90 mt-1">26.670 LY</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-mono tracking-[0.2em] text-white/45 uppercase">Độ Tương Phản</p>
+                        <p class="font-mono text-sm sm:text-base text-white/90 mt-1">#000000</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-mono tracking-[0.2em] text-white/45 uppercase">Tọa Độ Quét</p>
+                        <p id="hero-live-ra" class="font-mono text-sm sm:text-base text-white/90 mt-1">17h 45m</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 2. DANH MỤC THIÊN THỂ ĐÊM ĐEN ==================== -->
+        <section id="celestial" class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+
+                <!-- Tiêu đề khu vực -->
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+                    <div>
+                        <p class="text-[11px] font-mono tracking-[0.26em] text-white/50 uppercase">Deep Sky Catalog // Noctis</p>
+                        <h2 class="font-space font-bold text-2xl sm:text-4xl text-white mt-2 starlight-subtle">
+                            Danh mục Thiên thể Đêm Đen
+                        </h2>
+                    </div>
+                    <p class="text-xs sm:text-sm text-white/60 max-w-md font-light">
+                        Chọn một thiên thể để quan sát cấu trúc ánh sao đơn sắc và tra cứu thông số thiên văn học chuẩn xác.
+                    </p>
+                </div>
+
+                <!-- Thanh chọn 6 thiên thể -->
+                <div id="celestial-tabs" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mb-8">
+                    <!-- Render tự động bằng JS -->
+                </div>
+
+                <!-- Khung hiển thị chi tiết Thiên thể -->
+                <div class="obsidian-glass rounded-3xl p-6 sm:p-8 lg:p-10 relative overflow-hidden">
+                    <!-- Góc định vị ngắm thiên văn (Crosshair corners) -->
+                    <div class="absolute top-4 left-4 w-3 h-3 border-t border-l border-white/30 pointer-events-none"></div>
+                    <div class="absolute top-4 right-4 w-3 h-3 border-t border-r border-white/30 pointer-events-none"></div>
+                    <div class="absolute bottom-4 left-4 w-3 h-3 border-b border-l border-white/30 pointer-events-none"></div>
+                    <div class="absolute bottom-4 right-4 w-3 h-3 border-b border-r border-white/30 pointer-events-none"></div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+
+                        <!-- Trái: Đồ họa CSS/SVG đơn sắc ánh sao -->
+                        <div class="lg:col-span-5 flex flex-col items-center justify-center">
+                            <div class="relative w-60 h-60 sm:w-72 sm:h-72 rounded-full border border-white/10 bg-black/80 flex items-center justify-center overflow-hidden shadow-[inset_0_0_50px_rgba(255,255,255,0.04)]">
+                                <!-- Vòng chia độ kính thiên văn -->
+                                <div class="absolute inset-3 rounded-full border border-dashed border-white/10 pointer-events-none"></div>
+                                <div class="absolute inset-x-0 top-1/2 h-[1px] bg-white/[0.06] pointer-events-none"></div>
+                                <div class="absolute inset-y-0 left-1/2 w-[1px] bg-white/[0.06] pointer-events-none"></div>
+
+                                <!-- Nội dung SVG/CSS riêng cho từng thiên thể -->
+                                <div id="celestial-visual" class="celestial-fade w-full h-full flex items-center justify-center">
+                                    <!-- Render bằng JS -->
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-4 mt-5">
+                                <button onclick="stepCelestial(-1)" class="px-3.5 py-1.5 rounded-full border border-white/15 bg-black/70 text-[11px] font-mono text-white/80 hover:border-white/50 hover:text-white transition-all cursor-pointer">
+                                    ← TRƯỚC
+                                </button>
+                                <span id="celestial-counter" class="text-xs font-mono text-white/50 tracking-widest">01 / 06</span>
+                                <button onclick="stepCelestial(1)" class="px-3.5 py-1.5 rounded-full border border-white/15 bg-black/70 text-[11px] font-mono text-white/80 hover:border-white/50 hover:text-white transition-all cursor-pointer">
+                                    SAU →
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Phải: Thông số thiên văn chi tiết -->
+                        <div id="celestial-info" class="lg:col-span-7 space-y-6 celestial-fade">
+                            <div class="border-b border-white/10 pb-5 flex flex-wrap items-start justify-between gap-4">
+                                <div>
+                                    <span id="c-catalog" class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-[0.2em] border border-white/20 text-white/80 mb-2">SGR A* // CORE</span>
+                                    <h3 id="c-name" class="font-space font-bold text-2xl sm:text-4xl text-white starlight-subtle">Hố đen Sagittarius A*</h3>
+                                </div>
+                                <div class="text-left sm:text-right">
+                                    <p class="text-[10px] font-mono text-white/45 uppercase tracking-widest">Phân loại</p>
+                                    <p id="c-type" class="font-mono text-xs sm:text-sm text-white/90 mt-1">Hố đen siêu khối lượng</p>
+                                </div>
+                            </div>
+
+                            <!-- 4 Thông số thiên văn -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                <div class="p-4 rounded-2xl bg-black/70 border border-white/10">
+                                    <p class="text-[10px] font-mono tracking-[0.18em] text-white/45 uppercase mb-1">Khoảng cách</p>
+                                    <p id="c-distance" class="font-mono text-sm sm:text-base text-white">26.670 năm ánh sáng</p>
+                                </div>
+                                <div class="p-4 rounded-2xl bg-black/70 border border-white/10">
+                                    <p class="text-[10px] font-mono tracking-[0.18em] text-white/45 uppercase mb-1">Độ sáng biểu kiến</p>
+                                    <p id="c-magnitude" class="font-mono text-sm sm:text-base text-white">Không khả kiến (Vô tuyến)</p>
+                                </div>
+                                <div class="p-4 rounded-2xl bg-black/70 border border-white/10">
+                                    <p class="text-[10px] font-mono tracking-[0.18em] text-white/45 uppercase mb-1">Tọa độ Xích kinh (RA)</p>
+                                    <p id="c-ra" class="font-mono text-sm sm:text-base text-white">17h 45m 40.04s</p>
+                                </div>
+                                <div class="p-4 rounded-2xl bg-black/70 border border-white/10">
+                                    <p class="text-[10px] font-mono tracking-[0.18em] text-white/45 uppercase mb-1">Tọa độ Xích vĩ (DEC)</p>
+                                    <p id="c-dec" class="font-mono text-sm sm:text-base text-white">-29° 00' 28.1"</p>
+                                </div>
+                            </div>
+
+                            <!-- Ghi chú quan sát -->
+                            <div class="p-4 sm:p-5 rounded-2xl bg-white/[0.03] border border-white/10">
+                                <p class="text-[10px] font-mono tracking-[0.2em] text-white/50 uppercase mb-1.5">Ghi chú Đài quan sát</p>
+                                <p id="c-desc" class="text-sm text-slate-300 leading-relaxed font-light">
+                                    Nằm tại trung tâm của Dải Ngân Hà, Sagittarius A* có khối lượng gấp khoảng 4,3 triệu lần Mặt Trời, điều khiển quỹ đạo chuyển động của hàng tỷ ngôi sao xung quanh.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 3. THÔNG TIN ĐÀI QUAN SÁT ==================== -->
+        <section id="observatory" class="py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="obsidian-glass rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                    <div class="space-y-2 max-w-2xl">
+                        <p class="text-[11px] font-mono tracking-[0.24em] text-white/50 uppercase">Observatory Telemetry</p>
+                        <h3 class="font-space font-semibold text-xl sm:text-2xl text-white">Đài Quan Sát Tĩnh Lặng NOCTIS</h3>
+                        <p class="text-xs sm:text-sm text-white/60 leading-relaxed font-light">
+                            Sử dụng thanh điều khiển cố định bên dưới để tùy chỉnh mật độ hàng nghìn ngôi sao, bật đường nối chòm sao theo con trỏ chuột, dừng/chạy độ xoay dải Ngân Hà hoặc lắng nghe tần số không gian sâu lắng.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full lg:w-auto font-mono text-xs">
+                        <div class="px-4 py-3 rounded-2xl bg-black/70 border border-white/10">
+                            <span class="block text-[10px] text-white/45 uppercase">Chế độ Warp</span>
+                            <span id="obs-warp-state" class="text-white mt-0.5 block">TẮT</span>
+                        </div>
+                        <div class="px-4 py-3 rounded-2xl bg-black/70 border border-white/10">
+                            <span class="block text-[10px] text-white/45 uppercase">Chòm sao</span>
+                            <span id="obs-const-state" class="text-white mt-0.5 block">BẬT</span>
+                        </div>
+                        <div class="px-4 py-3 rounded-2xl bg-black/70 border border-white/10 col-span-2 sm:col-span-1">
+                            <span class="block text-[10px] text-white/45 uppercase">Xoay Thiên Hà</span>
+                            <span id="obs-rot-state" class="text-white mt-0.5 block">ĐANG XOAY</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== THANH ĐIỀU KHIỂN ĐÀI QUAN SÁT CỐ ĐỊNH Ở GÓC DƯỚI ==================== -->
+    <aside class="ui-layer fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-4xl">
+        <div class="obsidian-glass-strong rounded-2xl sm:rounded-full px-3 py-2.5 sm:px-5 sm:py-2.5 shadow-[0_10px_40px_rgba(0,0,0,0.9)]">
+            <div class="flex flex-wrap items-center justify-center sm:justify-between gap-2">
+
+                <!-- 1. Bật/Tắt Warp Speed -->
+                <button id="ctrl-warp" onclick="toggleWarp()"
+                    class="flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-mono tracking-wider border border-white/15 bg-white/[0.04] text-white/85 hover:border-white/40 transition-all cursor-pointer">
+                    <span id="ctrl-warp-dot" class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+                    <span>WARP</span>
+                </button>
+
+                <!-- 2. Bật/Tắt Đường nối Chòm sao -->
+                <button id="ctrl-constellation" onclick="toggleConstellations()"
+                    class="flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-mono tracking-wider border border-white/45 bg-white/15 text-white transition-all cursor-pointer">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 17L17 7M7 7l10 10M4 12h2m12 0h2"/>
+                    </svg>
+                    <span>CHÒM SAO</span>
+                </button>
+
+                <!-- 3. Chỉnh Mật độ sao (Vừa / Dày đặc / Siêu Ngân Hà) -->
+                <div class="flex items-center rounded-full border border-white/15 bg-black/70 p-0.5 text-[10px] font-mono">
+                    <button id="dens-medium" onclick="setStarDensity('medium')" class="px-2.5 py-1.5 rounded-full text-white/60 hover:text-white transition-all cursor-pointer">Vừa</button>
+                    <button id="dens-dense" onclick="setStarDensity('dense')" class="px-2.5 py-1.5 rounded-full bg-white text-black font-semibold transition-all cursor-pointer">Dày đặc</button>
+                    <button id="dens-ultra" onclick="setStarDensity('ultra')" class="px-2.5 py-1.5 rounded-full text-white/60 hover:text-white transition-all cursor-pointer">Siêu Ngân Hà</button>
+                </div>
+
+                <!-- 4. Bật/Tắt Xoay thiên hà -->
+                <button id="ctrl-rotate" onclick="toggleGalaxyRotation()"
+                    class="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] font-mono tracking-wider border border-white/45 bg-white/15 text-white transition-all cursor-pointer">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    <span>XOAY</span>
+                </button>
+
+                <!-- 5. Bật/Tắt Âm thanh không gian (Web Audio API) -->
+                <button id="ctrl-audio" onclick="toggleDeepSpaceAudio()"
+                    class="flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-mono tracking-wider border border-white/15 bg-white/[0.04] text-white/85 hover:border-white/40 transition-all cursor-pointer">
+                    <div id="ctrl-audio-eq" class="flex items-center gap-[2px] h-3.5">
+                        <span class="mono-eq-bar"></span>
+                        <span class="mono-eq-bar"></span>
+                        <span class="mono-eq-bar"></span>
+                        <span class="mono-eq-bar"></span>
+                    </div>
+                    <span id="ctrl-audio-label">ÂM THANH</span>
+                </button>
+
+            </div>
+        </div>
+    </aside>
+
+    <!-- ==================== JAVASCRIPT: GALAXY ENGINE, CELESTIAL CATALOG & WEB AUDIO ==================== -->
+    <script>
+        /* =========================================================================
+           1. CẤU HÌNH & TRẠNG THÁI HỆ THỐNG THIÊN HÀ (60FPS CANVAS ENGINE)
+           ========================================================================= */
+        const canvas = document.getElementById('galaxy-canvas');
+        const ctx = canvas.getContext('2d', { alpha: false });
+
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        // Trạng thái điều khiển
+        const state = {
+            warp: false,
+            constellations: true,
+            rotateGalaxy: true,
+            density: 'dense', // 'medium' (1500), 'dense' (2800), 'ultra' (4200)
+            stargazing: false,
+            audioOn: false,
+            entering: false
+        };
+
+        const DENSITY_MAP = {
+            medium: 1500,
+            dense: 2800,
+            ultra: 4200
+        };
+
+        // Màu sắc sao tự nhiên chân thực
+        const STAR_PALETTE = [
+            '#ffffff', // Trắng tinh khiết
+            '#ffffff',
+            '#ffffff',
+            '#dceeff', // Xanh băng nhạt
+            '#dceeff',
+            '#fff3d1', // Vàng nhạt ánh sao
+            '#9ca3af'  // Bạc mờ
+        ];
+
+        // Dữ liệu sao & sao băng
+        let stars = [];
+        let shootingStars = [];
+
+        // Biến nội suy Warp & Parallax chuột
+        let warpFactor = 0;       // 0 -> 1 mượt mà
+        let galaxyAngle = 0;      // Góc xoay cực chậm của dải Ngân Hà
+        let pointerX = width / 2;
+        let pointerY = height / 2;
+        let smoothParallaxX = 0;
+        let smoothParallaxY = 0;
+        let pointerActive = false;
+
+        // Hàm tạo số ngẫu nhiên theo phân bố chuẩn (Gaussian) để dải Ngân Hà tập trung dày ở lõi
+        function randomGaussian() {
+            let u = 0, v = 0;
+            while (u === 0) u = Math.random();
+            while (v === 0) v = Math.random();
+            return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        }
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = Math.floor(width * dpr);
+            canvas.height = Math.floor(height * dpr);
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        /* Khởi tạo hàng nghìn ngôi sao:
+           - 50% tạo thành dải Ngân Hà chéo vắt ngang màn hình + cụm sao xoắn ốc
+           - 50% phân bố sâu khắp nền trời đen tuyền với nhiều lớp parallax */
+        function generateGalaxyStars() {
+            const total = DENSITY_MAP[state.density];
+            stars = new Array(total);
+            const diag = Math.hypot(width, height);
+            const tilt = -0.48; // Góc nghiêng dải Ngân Hà chéo vắt ngang màn hình
+            const cosT = Math.cos(tilt);
+            const sinT = Math.sin(tilt);
+
+            for (let i = 0; i < total; i++) {
+                const randType = Math.random();
+                let baseX, baseY;
+                let inMilkyWay = false;
+
+                if (randType < 0.44) {
+                    // Dải Ngân Hà chéo siêu dày (mật độ cao ở giữa dải, loãng dần ra hai bên)
+                    inMilkyWay = true;
+                    const along = (Math.random() - 0.5) * diag * 1.35;
+                    const across = randomGaussian() * (Math.min(width, height) * 0.13);
+                    baseX = along * cosT - across * sinT;
+                    baseY = along * sinT + across * cosT;
+                } else if (randType < 0.58) {
+                    // Cụm sao xoắn ốc tinh tế quanh tâm thiên hà
+                    inMilkyWay = true;
+                    const arm = i % 2;
+                    const radius = Math.pow(Math.random(), 1.45) * (Math.min(width, height) * 0.48);
+                    const spiralAngle = radius * 0.011 + arm * Math.PI + randomGaussian() * 0.35;
+                    const sx = Math.cos(spiralAngle) * radius;
+                    const sy = Math.sin(spiralAngle) * radius * 0.52;
+                    baseX = sx * cosT - sy * sinT;
+                    baseY = sx * sinT + sy * cosT;
+                } else {
+                    // Nền sao trường sâu phân bố đều khắp bầu trời
+                    baseX = (Math.random() - 0.5) * diag * 1.4;
+                    baseY = (Math.random() - 0.5) * diag * 1.4;
+                }
+
+                // Độ sâu parallax (0.15 = rất xa, 1.0 = gần)
+                const depth = 0.15 + Math.random() * 0.85;
+
+                // Kích thước sao đa dạng: phần lớn là bụi sao siêu nhỏ sắc nét, một số nhỏ là sao sáng lớn
+                const brightRoll = Math.random();
+                let radius, hasFlare = false, baseAlpha;
+                if (brightRoll > 0.988) {
+                    radius = 1.85 + Math.random() * 0.9;
+                    hasFlare = true; // Sao sáng có tia chữ thập (starlight flare)
+                    baseAlpha = 0.9 + Math.random() * 0.1;
+                } else if (brightRoll > 0.91) {
+                    radius = 1.05 + Math.random() * 0.55;
+                    baseAlpha = 0.65 + Math.random() * 0.3;
+                } else if (inMilkyWay) {
+                    radius = 0.32 + Math.random() * 0.62;
+                    baseAlpha = 0.28 + Math.random() * 0.55;
+                } else {
+                    radius = 0.4 + Math.random() * 0.65;
+                    baseAlpha = 0.3 + Math.random() * 0.55;
+                }
+
+                // Tọa độ Z riêng cho hiệu ứng Warp Speed phóng từ tâm
+                const z = 0.15 + Math.random() * 1.0;
+
+                stars[i] = {
+                    baseX,
+                    baseY,
+                    z,
+                    depth,
+                    radius,
+                    hasFlare,
+                    color: STAR_PALETTE[Math.floor(Math.random() * STAR_PALETTE.length)],
+                    baseAlpha,
+                    twinkleSpeed: 0.0012 + Math.random() * 0.0032,
+                    twinklePhase: Math.random() * Math.PI * 2,
+                    screenX: 0,
+                    screenY: 0,
+                    inMilkyWay
+                };
+            }
+
+            // Cập nhật nhãn số lượng sao ở Hero
+            const badge = document.getElementById('hero-star-count-badge');
+            if (badge) {
+                badge.textContent = `${total.toLocaleString('vi-VN')} NGÔI SAO SẮC NÉT // 60 FPS`;
+            }
+        }
+
+        // Tạo sao băng mảnh, sắc nét lướt qua nền đen
+        function spawnShootingStar() {
+            if (state.warp || shootingStars.length >= 2) return;
+            const startX = Math.random() * width * 0.85 + width * 0.08;
+            const startY = Math.random() * height * 0.42;
+            const angle = Math.PI * 0.18 + Math.random() * 0.28;
+            const speed = 15 + Math.random() * 12;
+
+            shootingStars.push({
+                x: startX,
+                y: startY,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                length: 85 + Math.random() * 110,
+                life: 1.0,
+                decay: 0.018 + Math.random() * 0.012
+            });
+        }
+
+        // Vẽ tia chữ thập sắc nét cho các ngôi sao sáng nhất
+        function drawStarFlare(x, y, size, alpha, color) {
+            const len = size * 5.2;
+            ctx.save();
+            ctx.globalAlpha = alpha * 0.78;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 0.75;
+
+            ctx.beginPath();
+            ctx.moveTo(x - len, y);
+            ctx.lineTo(x + len, y);
+            ctx.moveTo(x, y - len);
+            ctx.lineTo(x, y + len);
+            ctx.stroke();
+
+            // Tia chéo nhỏ phụ
+            const diagLen = len * 0.36;
+            ctx.globalAlpha = alpha * 0.4;
+            ctx.beginPath();
+            ctx.moveTo(x - diagLen, y - diagLen);
+            ctx.lineTo(x + diagLen, y + diagLen);
+            ctx.moveTo(x + diagLen, y - diagLen);
+            ctx.lineTo(x - diagLen, y + diagLen);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // Vòng lặp Render 60fps chính
+        function renderGalaxy(now) {
+            const cx = width * 0.5;
+            const cy = height * 0.5;
+
+            // Nội suy mượt cho Warp Speed
+            const targetWarp = state.warp ? 1 : 0;
+            warpFactor += (targetWarp - warpFactor) * 0.055;
+
+            // Nền ĐEN TUYỀN tuyệt đối #000000
+            if (warpFactor > 0.06) {
+                ctx.fillStyle = `rgba(0, 0, 0, ${0.42 - warpFactor * 0.16})`;
+            } else {
+                ctx.fillStyle = '#000000';
+            }
+            ctx.fillRect(0, 0, width, height);
+
+            // Chuyển động xoay cực chậm của thiên hà
+            if (state.rotateGalaxy) {
+                galaxyAngle += 0.00018;
+            }
+            const cosA = Math.cos(galaxyAngle);
+            const sinA = Math.sin(galaxyAngle);
+
+            // Nội suy Parallax chuột mượt mà
+            const targetPx = (pointerX - cx) * 0.045;
+            const targetPy = (pointerY - cy) * 0.045;
+            smoothParallaxX += (targetPx - smoothParallaxX) * 0.06;
+            smoothParallaxY += (targetPy - smoothParallaxY) * 0.06;
+
+            // Mảng lưu các ngôi sao gần con trỏ chuột để vẽ đường chòm sao
+            const nearCursorStars = [];
+            const connectRadiusSq = 155 * 155;
+
+            const starStep = state.entering ? 4 : 1;
+            for (let i = 0; i < stars.length; i += starStep) {
+                const s = stars[i];
+
+                if (warpFactor > 0.02) {
+                    // Chế độ Bước nhảy Ánh sáng (Warp Speed): kéo dài sao thành vệt trắng sắc lẹm
+                    const prevZ = s.z;
+                    s.z -= 0.022 * warpFactor * (0.6 + s.depth * 0.8);
+                    if (s.z <= 0.02) {
+                        s.z = 1.0;
+                        continue;
+                    }
+
+                    const rx = s.baseX * cosA - s.baseY * sinA;
+                    const ry = s.baseX * sinA + s.baseY * cosA;
+
+                    const sx = cx + (rx / s.z) * 0.85;
+                    const sy = cy + (ry / s.z) * 0.85;
+                    const px = cx + (rx / prevZ) * 0.85;
+                    const py = cy + (ry / prevZ) * 0.85;
+
+                    if (sx < -40 || sx > width + 40 || sy < -40 || sy > height + 40) continue;
+
+                    const streakAlpha = Math.min(1, (1 - s.z) * 1.15 * s.baseAlpha + 0.15);
+                    ctx.beginPath();
+                    ctx.moveTo(px, py);
+                    ctx.lineTo(sx, sy);
+                    ctx.strokeStyle = s.color;
+                    ctx.globalAlpha = streakAlpha;
+                    ctx.lineWidth = Math.max(0.55, s.radius * (1.2 - s.z * 0.6));
+                    ctx.stroke();
+                } else {
+                    // Chế độ Thiên Hà bình thường: xoay cực chậm + parallax chiều sâu + lấp lánh sắc nét
+                    const rx = s.baseX * cosA - s.baseY * sinA;
+                    const ry = s.baseX * sinA + s.baseY * cosA;
+
+                    const sx = cx + rx - smoothParallaxX * s.depth;
+                    const sy = cy + ry - smoothParallaxY * s.depth;
+
+                    if (sx < -20 || sx > width + 20 || sy < -20 || sy > height + 20) continue;
+
+                    s.screenX = sx;
+                    s.screenY = sy;
+
+                    const twinkle = 0.62 + 0.38 * Math.sin(now * s.twinkleSpeed + s.twinklePhase);
+                    const alpha = s.baseAlpha * twinkle;
+
+                    ctx.globalAlpha = alpha;
+                    ctx.fillStyle = s.color;
+
+                    if (s.radius <= 0.9) {
+                        // Vẽ điểm ảnh siêu sắc nét cho bụi sao nhỏ (tối ưu 60fps)
+                        ctx.fillRect(sx, sy, s.radius * 1.45, s.radius * 1.45);
+                    } else {
+                        ctx.beginPath();
+                        ctx.arc(sx, sy, s.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        if (s.hasFlare) {
+                            drawStarFlare(sx, sy, s.radius, alpha, s.color);
+                        }
+                    }
+
+                    // Thu thập sao sáng gần con trỏ chuột cho đường nối chòm sao
+                    if (!state.entering && state.constellations && pointerActive && s.radius > 0.72 && nearCursorStars.length < 34) {
+                        const dx = sx - pointerX;
+                        const dy = sy - pointerY;
+                        const distSq = dx * dx + dy * dy;
+                        if (distSq < connectRadiusSq) {
+                            nearCursorStars.push({ x: sx, y: sy, distSq });
+                        }
+                    }
+                }
+            }
+
+            // Vẽ các đường chòm sao mảnh màu trắng mờ quanh con trỏ chuột
+            if (!state.entering && state.constellations && warpFactor < 0.05 && nearCursorStars.length > 1) {
+                ctx.lineWidth = 0.65;
+                for (let i = 0; i < nearCursorStars.length; i++) {
+                    const a = nearCursorStars[i];
+                    for (let j = i + 1; j < nearCursorStars.length; j++) {
+                        const b = nearCursorStars[j];
+                        const dx = a.x - b.x;
+                        const dy = a.y - b.y;
+                        const dSq = dx * dx + dy * dy;
+                        if (dSq < 92 * 92) {
+                            const lineAlpha = (1 - Math.sqrt(dSq) / 92) * 0.28;
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${lineAlpha.toFixed(3)})`;
+                            ctx.globalAlpha = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(a.x, a.y);
+                            ctx.lineTo(b.x, b.y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            // Sao băng sắc nét ngẫu nhiên
+            if (!state.entering && Math.random() < 0.007) {
+                spawnShootingStar();
+            }
+
+            for (let i = shootingStars.length - 1; i >= 0; i--) {
+                const st = shootingStars[i];
+                st.x += st.vx;
+                st.y += st.vy;
+                st.life -= st.decay;
+
+                if (st.life <= 0) {
+                    shootingStars.splice(i, 1);
+                    continue;
+                }
+
+                const norm = Math.hypot(st.vx, st.vy);
+                const tailX = st.x - (st.vx / norm) * st.length;
+                const tailY = st.y - (st.vy / norm) * st.length;
+
+                const grad = ctx.createLinearGradient(st.x, st.y, tailX, tailY);
+                grad.addColorStop(0, `rgba(255, 255, 255, ${st.life})`);
+                grad.addColorStop(0.35, `rgba(220, 238, 255, ${st.life * 0.55})`);
+                grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 1.25;
+                ctx.beginPath();
+                ctx.moveTo(st.x, st.y);
+                ctx.lineTo(tailX, tailY);
+                ctx.stroke();
+            }
+
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(renderGalaxy);
+        }
+
+        /* =========================================================================
+           2. DANH MỤC 6 THIÊN THỂ ĐÊM ĐEN (DỮ LIỆU & ĐỒ HỌA SVG/CSS ĐƠN SẮC)
+           ========================================================================= */
+        const celestialObjects = [
+            {
+                id: 'sgr-a',
+                shortName: 'Sagittarius A*',
+                catalog: 'SGR A* // GALACTIC CORE',
+                name: 'Hố đen Sagittarius A*',
+                type: 'Hố đen siêu khối lượng',
+                distance: '26.670 năm ánh sáng',
+                magnitude: 'Không khả kiến (Vô tuyến)',
+                ra: '17h 45m 40.04s',
+                dec: '-29° 00\' 28.1"',
+                desc: 'Nằm tại tâm hấp dẫn của Dải Ngân Hà, Sagittarius A* sở hữu khối lượng gấp 4,3 triệu lần Mặt Trời. Vòng đĩa bồi tụ phát sáng trắng bạc bao quanh chân trời sự kiện đen tuyệt đối.',
+                svg: `
+                    <svg viewBox="0 0 240 240" class="w-56 h-56">
+                        <defs>
+                            <radialGradient id="bhGlow" cx="50%" cy="50%" r="50%">
+                                <stop offset="32%" stop-color="#000000" stop-opacity="1"/>
+                                <stop offset="44%" stop-color="#ffffff" stop-opacity="0.9"/>
+                                <stop offset="60%" stop-color="#dceeff" stop-opacity="0.22"/>
+                                <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+                            </radialGradient>
+                        </defs>
+                        <circle cx="120" cy="120" r="88" fill="url(#bhGlow)"/>
+                        <g class="anim-spin-slow" style="transform-origin:120px 120px;">
+                            <ellipse cx="120" cy="120" rx="92" ry="22" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="1.4" transform="rotate(-18 120 120)"/>
+                            <ellipse cx="120" cy="120" rx="76" ry="15" fill="none" stroke="#dceeff" stroke-opacity="0.45" stroke-width="0.9" stroke-dasharray="6 4" transform="rotate(-18 120 120)"/>
+                        </g>
+                        <circle cx="120" cy="120" r="34" fill="#000000" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.95"/>
+                        <circle cx="120" cy="120" r="38" fill="none" stroke="#ffffff" stroke-width="0.6" stroke-opacity="0.45"/>
+                    </svg>
+                `
+            },
+            {
+                id: 'm31',
+                shortName: 'Thiên hà M31',
+                catalog: 'MESSIER 31 // ANDROMEDA',
+                name: 'Thiên hà Tiên Nữ M31',
+                type: 'Thiên hà xoắn ốc có thanh',
+                distance: '2,537 triệu năm ánh sáng',
+                magnitude: '+3,44 (Thấy bằng mắt thường)',
+                ra: '00h 42m 44.3s',
+                dec: '+41° 16\' 09"',
+                desc: 'Thiên hà xoắn ốc lớn nhất trong Nhóm Địa Phương với khoảng 1 nghìn tỷ ngôi sao. Từ Trái Đất, M31 hiện lên như một dải sáng bạc mềm mại giữa bầu trời đêm thu.',
+                svg: `
+                    <svg viewBox="0 0 240 240" class="w-56 h-56">
+                        <defs>
+                            <radialGradient id="m31Core" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+                                <stop offset="30%" stop-color="#fff3d1" stop-opacity="0.55"/>
+                                <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+                            </radialGradient>
+                        </defs>
+                        <g transform="rotate(-28 120 120)">
+                            <ellipse cx="120" cy="120" rx="94" ry="30" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1"/>
+                            <ellipse cx="120" cy="120" rx="74" ry="22" fill="none" stroke="#dceeff" stroke-opacity="0.45" stroke-width="1.2" stroke-dasharray="14 6"/>
+                            <ellipse cx="120" cy="120" rx="52" ry="15" fill="none" stroke="#ffffff" stroke-opacity="0.65" stroke-width="1.2"/>
+                            <ellipse cx="120" cy="120" rx="34" ry="14" fill="url(#m31Core)"/>
+                            <circle cx="120" cy="120" r="6" fill="#ffffff"/>
+                        </g>
+                        <circle cx="64" cy="96" r="1.3" fill="#ffffff"/>
+                        <circle cx="176" cy="144" r="1.2" fill="#dceeff"/>
+                        <circle cx="156" cy="92" r="1" fill="#ffffff"/>
+                    </svg>
+                `
+            },
+            {
+                id: 'pleiades',
+                shortName: 'Cụm Thất Nữ',
+                catalog: 'MESSIER 45 // TAURUS',
+                name: 'Cụm sao Thất Nữ Pleiades',
+                type: 'Cụm sao mở (Open Cluster)',
+                distance: '444 năm ánh sáng',
+                magnitude: '+1,60',
+                ra: '03h 47m 24s',
+                dec: '+24° 07\' 00"',
+                desc: 'Nổi tiếng với 7 ngôi sao trẻ rực sáng ánh xanh băng nằm trong chòm sao Kim Ngưu. Toàn bộ cụm chứa hơn 1.000 ngôi sao liên kết lỏng lẻo bởi lực hấp dẫn.',
+                svg: `
+                    <svg viewBox="0 0 240 240" class="w-56 h-56">
+                        <g stroke="#dceeff" stroke-opacity="0.28" stroke-width="0.8">
+                            <line x1="70" y1="130" x2="105" y2="112"/>
+                            <line x1="105" y1="112" x2="128" y2="90"/>
+                            <line x1="128" y1="90" x2="156" y2="102"/>
+                            <line x1="156" y1="102" x2="170" y2="132"/>
+                            <line x1="105" y1="112" x2="122" y2="142"/>
+                            <line x1="122" y1="142" x2="170" y2="132"/>
+                        </g>
+                        <g class="anim-pulse-star" style="transform-origin:120px 120px;">
+                            <g transform="translate(128 90)"><circle r="4.2" fill="#ffffff"/><path d="M-16 0H16M0 -16V16" stroke="#dceeff" stroke-width="1"/></g>
+                            <g transform="translate(105 112)"><circle r="3.4" fill="#dceeff"/><path d="M-12 0H12M0 -12V12" stroke="#ffffff" stroke-width="0.8"/></g>
+                            <g transform="translate(156 102)"><circle r="3.2" fill="#ffffff"/><path d="M-11 0H11M0 -11V11" stroke="#dceeff" stroke-width="0.8"/></g>
+                            <g transform="translate(70 130)"><circle r="2.8" fill="#dceeff"/><path d="M-10 0H10M0 -10V10" stroke="#ffffff" stroke-width="0.7"/></g>
+                            <g transform="translate(122 142)"><circle r="3" fill="#ffffff"/><path d="M-10 0H10M0 -10V10" stroke="#dceeff" stroke-width="0.7"/></g>
+                            <g transform="translate(170 132)"><circle r="2.6" fill="#ffffff"/></g>
+                            <g transform="translate(92 84)"><circle r="2.2" fill="#dceeff"/></g>
+                        </g>
+                    </svg>
+                `
+            },
+            {
+                id: 'sirius',
+                shortName: 'Sao Sirius',
+                catalog: 'ALPHA CANIS MAJORIS',
+                name: 'Sao Thiên Lang Sirius',
+                type: 'Hệ sao đôi (A1V + Sao lùn trắng)',
+                distance: '8,60 năm ánh sáng',
+                magnitude: '-1,46 (Sáng nhất bầu trời đêm)',
+                ra: '06h 45m 08.9s',
+                dec: '-16° 42\' 58"',
+                desc: 'Ngôi sao sáng nhất trên bầu trời đêm Trái Đất, tỏa ánh sáng trắng xanh chói lọi gấp 25 lần độ sáng Mặt Trời, đồng hành cùng ngôi sao lùn trắng siêu đặc Sirius B.',
+                svg: `
+                    <svg viewBox="0 0 240 240" class="w-56 h-56">
+                        <defs>
+                            <radialGradient id="siriusHalo" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+                                <stop offset="22%" stop-color="#dceeff" stop-opacity="0.55"/>
+                                <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+                            </radialGradient>
+                        </defs>
+                        <circle cx="116" cy="120" r="64" fill="url(#siriusHalo)"/>
+                        <g class="anim-pulse-star" style="transform-origin:116px 120px;">
+                            <path d="M116 32 L116 208 M28 120 L204 120" stroke="#ffffff" stroke-width="1.3" stroke-opacity="0.9"/>
+                            <path d="M68 72 L164 168 M164 72 L68 168" stroke="#dceeff" stroke-width="0.8" stroke-opacity="0.55"/>
+                            <circle cx="116" cy="120" r="10" fill="#ffffff"/>
+                        </g>
+                        <!-- Sirius B: Sao lùn trắng đồng hành -->
+                        <circle cx="168" cy="144" r="2.5" fill="#ffffff"/>
+                        <circle cx="168" cy="144" r="6" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.7"/>
+                    </svg>
+                `
+            },
+            {
+                id: 'pulsar',
+                shortName: 'Sao Pulsar',
+                catalog: 'PSR B0531+21 // NEUTRON',
+                name: 'Sao Neutron Pulsar',
+                type: 'Sao Neutron tự quay siêu tốc',
+                distance: '6.500 năm ánh sáng',
+                magnitude: '+16,5 (Phát xung vô tuyến)',
+                ra: '05h 34m 31.9s',
+                dec: '+22° 00\' 52.1"',
+                desc: 'Tàn tích siêu đặc sau vụ nổ siêu tân tinh, chỉ rộng khoảng 20 km nhưng nặng hơn Mặt Trời. Nó quay hàng chục vòng mỗi giây và quét hai chùm tia bức xạ như ngọn hải đăng vũ trụ.',
+                svg: `
+                    <svg viewBox="0 0 240 240" class="w-56 h-56">
+                        <g class="anim-pulsar" style="transform-origin:120px 120px;">
+                            <polygon points="120,120 108,24 132,24" fill="#ffffff" fill-opacity="0.32"/>
+                            <polygon points="120,120 108,216 132,216" fill="#ffffff" fill-opacity="0.32"/>
+                            <line x1="120" y1="20" x2="120" y2="220" stroke="#ffffff" stroke-width="1.5"/>
+                        </g>
+                        <ellipse cx="120" cy="120" rx="68" ry="26" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.9" stroke-dasharray="4 4"/>
+                        <ellipse cx="120" cy="120" rx="46" ry="16" fill="none" stroke="#dceeff" stroke-opacity="0.55" stroke-width="0.9"/>
+                        <circle cx="120" cy="120" r="9" fill="#ffffff"/>
+                    </svg>
+                `
+            },
+            {
+                id: 'milky-way',
+                shortName: 'Dải Ngân Hà',
+                catalog: 'MILKY WAY // HOME GALAXY',
+                name: 'Dải Ngân Hà Milky Way',
+                type: 'Thiên hà xoắn ốc có thanh (SBbc)',
+                distance: 'Đường kính ~105.700 năm ánh sáng',
+                magnitude: 'Chứa 100 – 400 tỷ ngôi sao',
+                ra: '17h 45m 40s (Tâm)',
+                dec: '-29° 00\' 28" (Tâm)',
+                desc: 'Ngôi nhà thiên hà của Hệ Mặt Trời, nằm trên nhánh xoắn ốc Orion cách tâm khoảng 26.670 năm ánh sáng. Nhìn từ đêm tối tuyệt đối, nó vắt ngang bầu trời như một dòng sông bụi sao vô tận.',
+                svg: `
+                    <svg viewBox="0 0 240 240" class="w-56 h-56">
+                        <g class="anim-spin-slow" style="transform-origin:120px 120px;">
+                            <path d="M120 120 C145 95, 185 110, 192 145" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="1.4" stroke-dasharray="3 3"/>
+                            <path d="M120 120 C95 145, 55 130, 48 95" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="1.4" stroke-dasharray="3 3"/>
+                            <path d="M120 120 C145 145, 130 185, 95 192" fill="none" stroke="#dceeff" stroke-opacity="0.5" stroke-width="1.1" stroke-dasharray="2 4"/>
+                            <path d="M120 120 C95 95, 110 55, 145 48" fill="none" stroke="#dceeff" stroke-opacity="0.5" stroke-width="1.1" stroke-dasharray="2 4"/>
+                            <circle cx="120" cy="120" r="18" fill="#ffffff" fill-opacity="0.16"/>
+                            <circle cx="120" cy="120" r="6" fill="#ffffff"/>
+                        </g>
+                        <circle cx="120" cy="120" r="88" fill="none" stroke="#ffffff" stroke-opacity="0.14" stroke-width="0.8"/>
+                    </svg>
+                `
+            }
+        ];
+
+        let activeCelestialIdx = 0;
+
+        function renderCelestialTabs() {
+            const container = document.getElementById('celestial-tabs');
+            container.innerHTML = '';
+
+            celestialObjects.forEach((obj, idx) => {
+                const isActive = idx === activeCelestialIdx;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => selectCelestial(idx);
+                btn.className = `px-3.5 py-3 rounded-2xl text-left border transition-all cursor-pointer ${
+                    isActive
+                        ? 'bg-white text-black border-white shadow-[0_0_22px_rgba(255,255,255,0.25)]'
+                        : 'obsidian-glass text-white/75 hover:text-white hover:border-white/35'
+                }`;
+
+                btn.innerHTML = `
+                    <span class="block text-[9px] font-mono tracking-widest uppercase ${isActive ? 'text-black/60' : 'text-white/40'}">0${idx + 1}</span>
+                    <span class="block font-space font-semibold text-xs sm:text-sm mt-0.5 truncate">${obj.shortName}</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function selectCelestial(idx) {
+            activeCelestialIdx = idx;
+            const obj = celestialObjects[idx];
+
+            const visualEl = document.getElementById('celestial-visual');
+            const infoEl = document.getElementById('celestial-info');
+
+            visualEl.style.opacity = '0';
+            visualEl.style.transform = 'scale(0.92)';
+            infoEl.style.opacity = '0';
+            infoEl.style.transform = 'translateY(6px)';
+
+            setTimeout(() => {
+                visualEl.innerHTML = obj.svg;
+                document.getElementById('celestial-counter').textContent = `0${idx + 1} / 06`;
+                document.getElementById('c-catalog').textContent = obj.catalog;
+                document.getElementById('c-name').textContent = obj.name;
+                document.getElementById('c-type').textContent = obj.type;
+                document.getElementById('c-distance').textContent = obj.distance;
+                document.getElementById('c-magnitude').textContent = obj.magnitude;
+                document.getElementById('c-ra').textContent = obj.ra;
+                document.getElementById('c-dec').textContent = obj.dec;
+                document.getElementById('c-desc').textContent = obj.desc;
+
+                // Cập nhật tọa độ quét trên Hero
+                const heroRa = document.getElementById('hero-live-ra');
+                if (heroRa) heroRa.textContent = obj.ra.split(' ').slice(0, 2).join(' ');
+
+                visualEl.style.opacity = '1';
+                visualEl.style.transform = 'scale(1)';
+                infoEl.style.opacity = '1';
+                infoEl.style.transform = 'translateY(0)';
+            }, 160);
+
+            renderCelestialTabs();
+        }
+
+        function stepCelestial(dir) {
+            const next = (activeCelestialIdx + dir + celestialObjects.length) % celestialObjects.length;
+            selectCelestial(next);
+        }
+
+        /* =========================================================================
+           3. BỘ ĐIỀU KHIỂN ĐÀI QUAN SÁT (WARP, CHÒM SAO, MẬT ĐỘ, XOAY, NGẮM SAO)
+           ========================================================================= */
+        function toggleWarp() {
+            state.warp = !state.warp;
+
+            const heroWarpText = document.getElementById('hero-warp-text');
+            const ctrlWarp = document.getElementById('ctrl-warp');
+            const ctrlDot = document.getElementById('ctrl-warp-dot');
+            const obsState = document.getElementById('obs-warp-state');
+
+            if (state.warp) {
+                heroWarpText.textContent = 'DỪNG BƯỚC NHẢY ÁNH SÁNG';
+                ctrlWarp.className = 'flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-mono tracking-wider border border-white bg-white text-black font-semibold transition-all cursor-pointer';
+                ctrlDot.className = 'w-1.5 h-1.5 rounded-full bg-black animate-ping';
+                obsState.textContent = 'ĐANG KÍCH HOẠT';
+            } else {
+                heroWarpText.textContent = 'BƯỚC NHẢY ÁNH SÁNG (WARP)';
+                ctrlWarp.className = 'flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-mono tracking-wider border border-white/15 bg-white/[0.04] text-white/85 hover:border-white/40 transition-all cursor-pointer';
+                ctrlDot.className = 'w-1.5 h-1.5 rounded-full bg-white/40';
+                obsState.textContent = 'TẮT';
+            }
+
+            syncAudioWithWarp();
+        }
+
+        function toggleConstellations() {
+            state.constellations = !state.constellations;
+            const btn = document.getElementById('ctrl-constellation');
+            const obsState = document.getElementById('obs-const-state');
+
+            if (state.constellations) {
+                btn.className = 'flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-mono tracking-wider border border-white/45 bg-white/15 text-white transition-all cursor-pointer';
+                obsState.textContent = 'BẬT';
+            } else {
+                btn.className = 'flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-mono tracking-wider border border-white/15 bg-white/[0.04] text-white/60 hover:text-white transition-all cursor-pointer';
+                obsState.textContent = 'TẮT';
+            }
+        }
+
+        function setStarDensity(level) {
+            if (state.density === level) return;
+            state.density = level;
+            generateGalaxyStars();
+
+            ['medium', 'dense', 'ultra'].forEach(key => {
+                const el = document.getElementById(`dens-${key}`);
+                if (key === level) {
+                    el.className = 'px-2.5 py-1.5 rounded-full bg-white text-black font-semibold transition-all cursor-pointer';
+                } else {
+                    el.className = 'px-2.5 py-1.5 rounded-full text-white/60 hover:text-white transition-all cursor-pointer';
+                }
+            });
+        }
+
+        function toggleGalaxyRotation() {
+            state.rotateGalaxy = !state.rotateGalaxy;
+            const btn = document.getElementById('ctrl-rotate');
+            const obsState = document.getElementById('obs-rot-state');
+
+            if (state.rotateGalaxy) {
+                btn.className = 'flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] font-mono tracking-wider border border-white/45 bg-white/15 text-white transition-all cursor-pointer';
+                obsState.textContent = 'ĐANG XOAY';
+            } else {
+                btn.className = 'flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] font-mono tracking-wider border border-white/15 bg-white/[0.04] text-white/60 hover:text-white transition-all cursor-pointer';
+                obsState.textContent = 'TẠM DỪNG';
+            }
+        }
+
+        function toggleStargazingMode(enable) {
+            state.stargazing = enable;
+            document.body.classList.toggle('stargazing-active', enable);
+        }
+
+        /* =========================================================================
+           4. ÂM THANH KHÔNG GIAN SÂU LẮNG (WEB AUDIO API — MẶC ĐỊNH TẮT)
+           ========================================================================= */
+        let audioCtx = null;
+        let masterGain = null;
+        let lowpassFilter = null;
+        let baseOsc = null;
+        let harmonicOsc = null;
+
+        function initDeepSpaceAudio() {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContextClass();
+
+            masterGain = audioCtx.createGain();
+            masterGain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+            masterGain.connect(audioCtx.destination);
+
+            lowpassFilter = audioCtx.createBiquadFilter();
+            lowpassFilter.type = 'lowpass';
+            lowpassFilter.frequency.setValueAtTime(175, audioCtx.currentTime);
+            lowpassFilter.Q.setValueAtTime(2.5, audioCtx.currentTime);
+            lowpassFilter.connect(masterGain);
+
+            // Tần số nền trầm sâu tĩnh lặng (43.65 Hz - F1)
+            baseOsc = audioCtx.createOscillator();
+            baseOsc.type = 'sine';
+            baseOsc.frequency.setValueAtTime(43.65, audioCtx.currentTime);
+            baseOsc.connect(lowpassFilter);
+
+            // Sóng hòa âm nhẹ (65.41 Hz - C2)
+            harmonicOsc = audioCtx.createOscillator();
+            harmonicOsc.type = 'triangle';
+            harmonicOsc.frequency.setValueAtTime(65.41, audioCtx.currentTime);
+
+            const hGain = audioCtx.createGain();
+            hGain.gain.setValueAtTime(0.24, audioCtx.currentTime);
+            harmonicOsc.connect(hGain);
+            hGain.connect(lowpassFilter);
+
+            // LFO cực chậm mô phỏng nhịp thở sâu của vũ trụ
+            const lfo = audioCtx.createOscillator();
+            const lfoGain = audioCtx.createGain();
+            lfo.frequency.setValueAtTime(0.11, audioCtx.currentTime);
+            lfoGain.gain.setValueAtTime(42, audioCtx.currentTime);
+            lfo.connect(lfoGain);
+            lfoGain.connect(lowpassFilter.frequency);
+
+            baseOsc.start();
+            harmonicOsc.start();
+            lfo.start();
+        }
+
+        function syncAudioWithWarp() {
+            if (!audioCtx || !state.audioOn || !lowpassFilter) return;
+            const now = audioCtx.currentTime;
+            if (state.warp) {
+                lowpassFilter.frequency.exponentialRampToValueAtTime(420, now + 0.7);
+                baseOsc.frequency.exponentialRampToValueAtTime(58.27, now + 0.7);
+            } else {
+                lowpassFilter.frequency.exponentialRampToValueAtTime(175, now + 0.7);
+                baseOsc.frequency.exponentialRampToValueAtTime(43.65, now + 0.7);
+            }
+        }
+
+        function toggleDeepSpaceAudio() {
+            try {
+                if (!audioCtx) {
+                    initDeepSpaceAudio();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                state.audioOn = !state.audioOn;
+                const now = audioCtx.currentTime;
+                const btn = document.getElementById('ctrl-audio');
+                const eq = document.getElementById('ctrl-audio-eq');
+                const label = document.getElementById('ctrl-audio-label');
+
+                if (state.audioOn) {
+                    masterGain.gain.cancelScheduledValues(now);
+                    masterGain.gain.setTargetAtTime(0.15, now, 0.45);
+                    syncAudioWithWarp();
+
+                    btn.className = 'flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-mono tracking-wider border border-white/50 bg-white/15 text-white transition-all cursor-pointer';
+                    eq.classList.add('audio-on');
+                    label.textContent = 'ĐANG PHÁT';
+                } else {
+                    masterGain.gain.cancelScheduledValues(now);
+                    masterGain.gain.setTargetAtTime(0.0001, now, 0.25);
+
+                    btn.className = 'flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-mono tracking-wider border border-white/15 bg-white/[0.04] text-white/85 hover:border-white/40 transition-all cursor-pointer';
+                    eq.classList.remove('audio-on');
+                    label.textContent = 'ÂM THANH';
+                }
+            } catch (err) {
+                console.error('Không thể khởi tạo Web Audio API:', err);
+            }
+        }
+
+        /* =========================================================================
+           5. SỰ KIỆN CHUỘT, CẢM ỨNG, MENU MOBILE & KHỞI CHẠY
+           ========================================================================= */
+        window.addEventListener('mousemove', (e) => {
+            pointerX = e.clientX;
+            pointerY = e.clientY;
+            pointerActive = true;
+        });
+
+        window.addEventListener('mouseleave', () => {
+            pointerActive = false;
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches && e.touches.length > 0) {
+                pointerX = e.touches[0].clientX;
+                pointerY = e.touches[0].clientY;
+                pointerActive = true;
+            }
+        }, { passive: true });
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            generateGalaxyStars();
+        });
+
+        // Menu Mobile
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            document.querySelectorAll('.mobile-link').forEach(link => {
+                link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+            });
+        }
+
+        const doorGuideButton = document.querySelector('.door-guide-button');
+        const chibiCharacter = document.querySelector('.chibi-character');
+        const doorFog = document.querySelector('.door-fog');
+        const pinLock = document.querySelector('.pin-lock');
+        const pinInputs = pinLock ? [...pinLock.querySelectorAll('.pin-inputs input')] : [];
+        const pinStatus = pinLock ? pinLock.querySelector('.pin-status') : null;
+        const doorLeaf = document.querySelector('.door');
+        const doorExperience = document.querySelector('.door-experience');
+        const doorTunnel = document.querySelector('.door-tunnel');
+        const doorWarpFlare = document.querySelector('.door-warp-flare');
+        const correctPin = '29112005';
+
+        if (doorGuideButton && chibiCharacter) {
+            doorGuideButton.addEventListener('click', () => {
+                if (chibiCharacter.classList.contains('walking-to-door')) return;
+
+                doorGuideButton.classList.add('used');
+                chibiCharacter.src = 'image/chibidangsau.png';
+                chibiCharacter.classList.remove('chibi-character');
+                chibiCharacter.classList.add('chibi-character', 'walking-to-door');
+
+                window.setTimeout(() => {
+                    chibiCharacter.classList.remove('walking-to-door');
+                    chibiCharacter.classList.add('at-door');
+
+                    window.setTimeout(() => {
+                        doorGuideButton.style.display = 'none';
+                        if (doorFog) doorFog.classList.add('active');
+                        if (pinLock) {
+                            pinLock.classList.add('active');
+                            pinLock.setAttribute('aria-hidden', 'false');
+                        }
+                    }, 350);
+                }, 1800);
+            });
+        }
+
+        const pinPad = document.querySelector('.pin-pad');
+        pinInputs.forEach(input => input.setAttribute('tabindex', '-1'));
+
+        if (pinPad) {
+            pinPad.addEventListener('click', (event) => {
+                const key = event.target.closest('.pin-key');
+                if (!key || pinLock?.classList.contains('unlocked')) return;
+
+                if (key.dataset.clear === 'all') {
+                    pinInputs.forEach(input => input.value = '');
+                    if (pinStatus) pinStatus.textContent = '';
+                    return;
+                }
+
+                if (key.dataset.delete === 'one') {
+                    for (let index = pinInputs.length - 1; index >= 0; index--) {
+                        if (pinInputs[index].value) {
+                            pinInputs[index].value = '';
+                            break;
+                        }
+                    }
+                    if (pinStatus) pinStatus.textContent = '';
+                    return;
+                }
+
+                const digit = key.dataset.digit;
+                if (!digit) return;
+
+                const nextInput = pinInputs.find(input => !input.value);
+                if (nextInput) {
+                    nextInput.value = digit;
+                    checkPin();
+                }
+            });
+        }
+
+        function checkPin() {
+            if (!pinLock) return;
+            const pin = pinInputs.map(input => input.value).join('');
+            if (pin.length < 8) {
+                if (pinStatus) pinStatus.textContent = '';
+                return;
+            }
+
+            if (pin === correctPin) {
+                pinLock.classList.add('unlocked');
+                if (pinStatus) pinStatus.textContent = 'ĐÚNG — CỬA ĐANG MỞ';
+                pinInputs.forEach(input => input.disabled = true);
+
+                if (doorLeaf) doorLeaf.classList.add('is-opening');
+
+                if (doorFog) {
+                    doorFog.classList.remove('active');
+                    doorFog.classList.add('clearing');
+                }
+
+                window.setTimeout(() => {
+                    pinLock.classList.remove('active');
+                    pinLock.setAttribute('aria-hidden', 'true');
+                }, 850);
+
+                window.setTimeout(() => {
+                    if (doorExperience) doorExperience.classList.add('entering');
+                    if (doorTunnel) doorTunnel.classList.add('active');
+                    if (doorWarpFlare) doorWarpFlare.classList.add('active');
+                    state.entering = true;
+                    state.rotateGalaxy = false;
+                    shootingStars.length = 0;
+                }, 950);
+
+                window.setTimeout(() => {
+                    if (chibiCharacter) {
+                        chibiCharacter.style.opacity = '0';
+                        chibiCharacter.style.transition = 'opacity 0.45s ease';
+                    }
+                    const doorDecor = document.querySelectorAll(
+                        '.door-frame, .door-podium, .flower, .butterfly, .side-star, .crown-star'
+                    );
+                    doorDecor.forEach(element => element.style.opacity = '0');
+                    doorDecor.forEach(element => element.style.transition = 'opacity 0.45s ease');
+                }, 2050);
+            } else {
+                pinLock.classList.remove('shake');
+                void pinLock.offsetWidth;
+                pinLock.classList.add('shake');
+                if (pinStatus) pinStatus.textContent = 'MẬT KHẨU CHƯA ĐÚNG';
+                pinInputs.forEach(input => input.value = '');
+            }
+        }
+
+        // Phím ESC để thoát chế độ Ngắm sao nhanh
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && state.stargazing) {
+                toggleStargazingMode(false);
+            }
+        });
+
+        // Khởi chạy toàn bộ hệ thống sau khi tải trang
+        window.onload = function () {
+            resizeCanvas();
+            generateGalaxyStars();
+            requestAnimationFrame(renderGalaxy);
+        };
+    </script>
+</body>
+</html>
