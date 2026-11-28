@@ -530,23 +530,25 @@
             left: 50%;
             top: 50%;
             z-index: 45;
-            width: min(430px, calc(100vw - 32px));
+            width: min(520px, calc(100vw - 32px));
             max-height: min(520px, calc(100vh - 32px));
             padding: clamp(28px, 5vw, 52px);
+            padding-bottom: clamp(150px, 16vw, 176px);
             box-sizing: border-box;
             border: 2px solid rgba(255, 255, 255, .96);
-            border-radius: 14px;
+            border-radius: 10px 10px 16px 16px;
             background:
                 linear-gradient(rgba(255, 255, 255, .92), rgba(255, 239, 246, .97)),
                 repeating-linear-gradient(0deg, transparent 0 27px, rgba(220, 111, 149, .12) 28px);
             color: #6d3d50;
             text-align: left;
+            transform-origin: 50% 100%;
             box-shadow:
                 0 24px 70px rgba(0, 0, 0, .68),
                 0 0 28px rgba(255, 194, 218, .3);
             opacity: 0;
             visibility: hidden;
-            transform: translate(-50%, -47%) scale(.86) rotate(-2deg);
+            transform: translate(-50%, -47%) scale(.58) rotate(-5deg);
             transition:
                 opacity .42s ease,
                 visibility .42s ease,
@@ -560,21 +562,198 @@
             visibility: visible;
             transform: translate(-50%, -50%) scale(1) rotate(0deg);
             pointer-events: auto;
+            animation: letterOpen 0.72s cubic-bezier(.22, 1, .36, 1) both;
+        }
+
+        .letter-modal::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: -1px;
+            width: 62%;
+            height: 26%;
+            z-index: 1;
+            transform: translateX(-50%) rotateX(180deg);
+            transform-origin: top center;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            background: linear-gradient(135deg, #fff 0%, #ffd9e7 100%);
+            border-bottom: 1px solid rgba(220, 111, 149, .24);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .letter-modal.active::before {
+            animation: letterFlapOpen .58s .12s cubic-bezier(.22, 1, .36, 1) both;
+        }
+
+        @keyframes letterOpen {
+            0% {
+                filter: brightness(.7);
+                transform: translate(-50%, -47%) scale(.58) rotate(-5deg);
+            }
+            55% {
+                filter: brightness(1.08);
+                transform: translate(-50%, -51%) scale(1.05) rotate(1deg);
+            }
+            100% {
+                filter: brightness(1);
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            }
+        }
+
+        @keyframes letterFlapOpen {
+            0% {
+                opacity: 1;
+                transform: translateX(-50%) rotateX(180deg);
+            }
+            88% {
+                opacity: 1;
+                transform: translateX(-50%) rotateX(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) rotateX(0deg);
+            }
         }
 
         .letter-modal h2 {
+            position: relative;
+            z-index: 5;
             margin: 0 0 18px;
             color: #c95f83;
             font: 600 clamp(20px, 3vw, 28px) 'Space Grotesk', sans-serif;
         }
 
         .letter-modal p {
+            position: relative;
+            z-index: 5;
             margin: 0;
             font-size: clamp(15px, 2vw, 18px);
             line-height: 1.75;
         }
 
+        .letter-photo {
+            position: absolute;
+            left: clamp(18px, 4vw, 34px);
+            bottom: clamp(18px, 4vw, 28px);
+            width: clamp(92px, 16vw, 136px);
+            height: clamp(68px, 12vw, 102px);
+            object-fit: cover;
+            border: 6px solid #fff;
+            border-bottom-width: 14px;
+            border-radius: 4px;
+            box-shadow: 0 12px 24px rgba(91, 49, 67, .28);
+            transform: rotate(-4deg);
+            z-index: 2;
+        }
+
+        .birthday-card-backdrop {
+            position: absolute;
+            inset: 0;
+            z-index: 69;
+            border: 0;
+            background: rgba(0, 0, 0, .72);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity .4s ease, visibility .4s ease;
+        }
+
+        .birthday-card-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .birthday-card {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: 70;
+            width: min(560px, calc(100vw - 32px));
+            min-height: min(430px, calc(100vh - 32px));
+            box-sizing: border-box;
+            padding: clamp(38px, 7vw, 68px);
+            border: 3px solid #fff;
+            border-radius: 18px;
+            background:
+                radial-gradient(circle at 15% 18%, #fff 0 3px, transparent 4px),
+                radial-gradient(circle at 82% 24%, #ffd3e5 0 4px, transparent 5px),
+                radial-gradient(circle at 72% 82%, #fff 0 3px, transparent 4px),
+                linear-gradient(145deg, #fffafd 0%, #ffe2ed 58%, #ffc4d9 100%);
+            color: #7a4055;
+            text-align: center;
+            box-shadow:
+                0 30px 90px rgba(0, 0, 0, .75),
+                0 0 40px rgba(255, 194, 218, .42);
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, -47%) scale(.35) rotateY(-28deg);
+            transform-origin: 50% 50%;
+            transition:
+                opacity .45s ease,
+                visibility .45s ease,
+                transform .75s cubic-bezier(.22, 1, .36, 1);
+            pointer-events: none;
+        }
+
+        .birthday-card.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1) rotateY(0deg);
+            pointer-events: auto;
+            animation: birthdayCardBloom .9s cubic-bezier(.22, 1, .36, 1) both;
+        }
+
+        @keyframes birthdayCardBloom {
+            0% { filter: brightness(.6); transform: translate(-50%, -47%) scale(.35) rotateY(-28deg); }
+            55% { filter: brightness(1.12); transform: translate(-50%, -51%) scale(1.06) rotateY(4deg); }
+            100% { filter: brightness(1); transform: translate(-50%, -50%) scale(1) rotateY(0deg); }
+        }
+
+        .birthday-card h2 {
+            margin: 0 0 18px;
+            color: #c95f83;
+            font: 700 clamp(28px, 6vw, 48px) 'Space Grotesk', sans-serif;
+            line-height: 1.12;
+        }
+
+        .birthday-card p {
+            margin: 0;
+            font-size: clamp(16px, 3vw, 20px);
+            line-height: 1.8;
+        }
+
+        .birthday-card-close {
+            margin-top: 26px;
+            padding: 10px 18px;
+            border: 1px solid rgba(201, 95, 131, .35);
+            border-radius: 999px;
+            background: #fff;
+            color: #c95f83;
+            font: 600 12px 'JetBrains Mono', monospace;
+            letter-spacing: .08em;
+            cursor: pointer;
+        }
+
         @media (max-width: 600px) {
+            .letter-modal {
+                min-height: 330px;
+                padding: 24px 22px 135px;
+            }
+            .letter-modal h2 {
+                margin-bottom: 12px;
+            }
+            .letter-modal p {
+                font-size: 14px;
+                line-height: 1.6;
+            }
+            .letter-photo {
+                width: 92px;
+                height: 68px;
+            }
             .memory-letter {
                 width: 58px;
                 height: 42px;
@@ -1457,6 +1636,13 @@
             <article class="letter-modal" role="dialog" aria-modal="true" aria-hidden="true">
                 <h2></h2>
                 <p></p>
+                <img class="letter-photo" src="letter/vy.jpg" alt="Ảnh trong thư Vy gửi">
+            </article>
+            <button class="birthday-card-backdrop" type="button" aria-label="Đóng thiệp chúc mừng"></button>
+            <article class="birthday-card" role="dialog" aria-modal="true" aria-label="Thiệp chúc mừng sinh nhật" aria-hidden="true">
+                <h2>Chúc mừng sinh nhật!</h2>
+                <p>Chúc Pu một tuổi mới thật rực rỡ, nhiều sức khỏe, nhiều niềm vui và luôn được yêu thương mỗi ngày.</p>
+                <button class="birthday-card-close" type="button">ĐÓNG THIỆP</button>
             </article>
         </section>
         <div class="pin-lock" role="dialog" aria-modal="true" aria-label="Ổ khóa mật khẩu">
@@ -2736,6 +2922,9 @@
                 pinLock.classList.add('unlocked');
                 if (pinStatus) pinStatus.textContent = 'ĐÚNG — CỬA ĐANG MỞ';
                 pinInputs.forEach(input => input.disabled = true);
+                if (typeof window.playBirthdayMelody === 'function') {
+                    window.playBirthdayMelody();
+                }
                 if (typeof window.preloadPanoramaPhotos === 'function') {
                     window.preloadPanoramaPhotos();
                 }
@@ -2829,22 +3018,70 @@
         const idleRotateSpeed = 0.035;
         const defaultFov = 75;
         const letterContents = [
-            ['Gửi anh yêu', 'Cảm ơn anh đã luôn ở đây, nhẹ nhàng và kiên nhẫn. Có anh, mỗi ngày đều trở nên an toàn và đáng nhớ hơn.'],
-            ['Điều em muốn nói', 'Anh đừng quên giữ bình yên cho riêng mình, em luôn tin vào anh và tự hào vì những gì anh đang nỗ lực.'],
-            ['Kỷ niệm nhỏ', 'Mỗi khoảnh khắc bên anh đều là một vì sao nhỏ. Em muốn cùng anh gom tất cả những vì sao ấy thành cả bầu trời.'],
-            ['Luôn ở bên anh', 'Dù ngày mai có thế nào, em vẫn muốn anh biết rằng em yêu anh rất nhiều và sẽ luôn đồng hành cùng anh.']
+            ['Vy gửi', 'Chúc Pu sinh nhật zui zẻ, hạnh phúc zà nhiều niềm zui.', 'letter/vy.jpg'],
+            ['Gửi quả trứng', 'Chúc Con tuổi mới mau lớn , quả trứng nhiều hơn , có nhiều niềm vui hơn và đừng có hành ba nữa.', 'letter/phat.jpg'],
+            ['Ti gửi', 'Chuc ban tuoi moi lon xinh nhu hoa.', 'letter/ti.jpg'],
+            ['Khang gửi', 'Chúc Publes sinh nhật vui vẻ, chúc Pu luôn vui vẻ hạnh phúc nhé.', 'letter/khang.jpg']
         ];
         let openLetterIndex = -1;
         let pointerDownX = 0;
         let pointerDownY = 0;
         const letterBackdrop = viewerRoot.querySelector('.letter-backdrop');
         const letterModal = viewerRoot.querySelector('.letter-modal');
+        const viewedLetters = new Set();
+        let birthdayCardShown = false;
+        const birthdayCard = viewerRoot.querySelector('.birthday-card');
+        const birthdayBackdrop = viewerRoot.querySelector('.birthday-card-backdrop');
+        const birthdayClose = viewerRoot.querySelector('.birthday-card-close');
+        let birthdayMusic = null;
+
+        function playBirthdayMelody() {
+            try {
+                if (!birthdayMusic) {
+                    birthdayMusic = new Audio('music/music.mp3');
+                    birthdayMusic.loop = true;
+                    birthdayMusic.preload = 'auto';
+                    birthdayMusic.volume = 0.7;
+                }
+                birthdayMusic.currentTime = 0;
+                const playPromise = birthdayMusic.play();
+                if (playPromise) {
+                    playPromise.catch(error => {
+                        console.warn('Trình duyệt chưa cho phép phát nhạc:', error);
+                    });
+                }
+            } catch (error) {
+                console.warn('Không thể phát nhạc thiệp sinh nhật:', error);
+            }
+        }
+        window.playBirthdayMelody = playBirthdayMelody;
+
+        function closeBirthdayCard() {
+            birthdayCard?.classList.remove('active');
+            birthdayBackdrop?.classList.remove('active');
+            birthdayCard?.setAttribute('aria-hidden', 'true');
+        }
+
+        function showBirthdayCard() {
+            if (birthdayCardShown || !birthdayCard) return;
+            birthdayCardShown = true;
+            birthdayBackdrop?.classList.add('active');
+            birthdayCard.classList.add('active');
+            birthdayCard.setAttribute('aria-hidden', 'false');
+        }
 
         function closeLetterModal() {
+            if (openLetterIndex >= 0) {
+                viewedLetters.add(openLetterIndex);
+            }
             openLetterIndex = -1;
             letterBackdrop?.classList.remove('active');
             letterModal?.classList.remove('active');
             letterModal?.setAttribute('aria-hidden', 'true');
+
+            if (viewedLetters.size === letterContents.length) {
+                window.setTimeout(showBirthdayCard, 420);
+            }
         }
 
         function openLetterModal(index) {
@@ -2852,6 +3089,11 @@
             openLetterIndex = index;
             letterModal.querySelector('h2').textContent = letterContents[index][0];
             letterModal.querySelector('p').textContent = letterContents[index][1];
+            const letterPhoto = letterModal.querySelector('.letter-photo');
+            if (letterPhoto) {
+                letterPhoto.src = letterContents[index][2];
+                letterPhoto.alt = `Ảnh trong thư ${letterContents[index][0]}`;
+            }
             letterModal.classList.add('active');
             letterModal.setAttribute('aria-hidden', 'false');
             letterBackdrop?.classList.add('active');
@@ -2859,8 +3101,13 @@
 
         letterBackdrop?.addEventListener('click', closeLetterModal);
         letterModal?.addEventListener('click', closeLetterModal);
+        birthdayBackdrop?.addEventListener('click', closeBirthdayCard);
+        birthdayClose?.addEventListener('click', closeBirthdayCard);
         window.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') closeLetterModal();
+            if (event.key === 'Escape') {
+                closeLetterModal();
+                closeBirthdayCard();
+            }
         });
         const albumPhotoUrls = Array.from({ length: 20 }, (_, index) =>
             `image/360/pu${index + 1}.jpg`
@@ -3172,12 +3419,12 @@
             });
 
             const notes = [
-                'Em luôn ở đây',
-                'Hay cứ là chính anh nhé',
-                'Mong anh luôn bình yên',
-                'Em thấy may mắn vì có anh',
-                'Mỗi khoảnh khắc đều quý',
-                'Yêu anh thật nhiều'
+                'Cục dàng của mn',
+                'Tuổi mới chống lớn',
+                'Sinh nhật vui vẻ nhé',
+                'Cảm ơn pu ra đời',
+                'Quả trứng vô ơn',
+                'Mỏ hỗn lắm',
             ];
             notes.forEach((text, index) => {
                 const sourceIndex = (index * 5 + 3) % cardCount;
