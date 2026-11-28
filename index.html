@@ -350,72 +350,243 @@
             touch-action: none;
         }
 
-        .panorama-hud {
+        .memory-letter {
+            --letter-left: 8%;
+            --letter-top: 50%;
             position: absolute;
-            z-index: 5;
-            left: 50%;
-            bottom: max(22px, env(safe-area-inset-bottom));
-            transform: translateX(-50%);
-            width: min(92vw, 620px);
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            gap: 9px;
-            pointer-events: none;
-        }
-
-        .panorama-hud > * { pointer-events: auto; }
-
-        .panorama-hint {
-            flex-basis: 100%;
-            color: rgba(255,255,255,.78);
-            text-align: center;
-            font: 11px/1.5 'JetBrains Mono', monospace;
-            letter-spacing: .08em;
-            text-shadow: 0 2px 12px #000;
-        }
-
-        .panorama-button {
-            border: 1px solid rgba(255,255,255,.24);
-            border-radius: 999px;
-            padding: 10px 15px;
-            color: #fff;
-            background: rgba(0,0,0,.58);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            font: 11px 'JetBrains Mono', monospace;
-            letter-spacing: .06em;
+            left: var(--letter-left);
+            top: var(--letter-top);
+            z-index: 12;
+            width: clamp(70px, 7vw, 96px);
+            height: clamp(48px, 5vw, 68px);
+            padding: 0;
+            border: 0;
+            background: transparent;
             cursor: pointer;
-            transition: background .2s ease, border-color .2s ease;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) rotate(var(--letter-rotation, 0deg));
+            transition:
+                left .55s cubic-bezier(.22, 1, .36, 1),
+                top .55s cubic-bezier(.22, 1, .36, 1),
+                width .55s cubic-bezier(.22, 1, .36, 1),
+                height .55s cubic-bezier(.22, 1, .36, 1),
+                transform .55s cubic-bezier(.22, 1, .36, 1),
+                opacity .35s ease;
+            filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .38));
         }
 
-        .panorama-button:hover {
-            background: rgba(255,255,255,.16);
-            border-color: rgba(255,255,255,.65);
+        .memory-letter:nth-of-type(2) {
+            --letter-left: 8%;
+            --letter-top: 27%;
+            --letter-rotation: -7deg;
         }
 
-        #panorama-file { display: none; }
+        .memory-letter:nth-of-type(3) {
+            --letter-left: 92%;
+            --letter-top: 27%;
+            --letter-rotation: 6deg;
+        }
 
-        .panorama-title {
+        .memory-letter:nth-of-type(4) {
+            --letter-left: 8%;
+            --letter-top: 70%;
+            --letter-rotation: 5deg;
+        }
+
+        .memory-letter:nth-of-type(5) {
+            --letter-left: 92%;
+            --letter-top: 70%;
+            --letter-rotation: -5deg;
+        }
+
+        .letter-envelope {
             position: absolute;
-            z-index: 4;
-            top: max(22px, env(safe-area-inset-top));
+            inset: 0;
+            display: block;
+            border: 2px solid rgba(255, 255, 255, .95);
+            border-radius: 5px;
+            background: linear-gradient(145deg, #fffafd 0%, #ffdce9 100%);
+            box-shadow:
+                inset 0 0 14px rgba(255, 255, 255, .9),
+                0 0 16px rgba(255, 194, 218, .24);
+            overflow: hidden;
+            transition: opacity .25s ease;
+        }
+
+        .letter-envelope::before {
+            content: '';
+            position: absolute;
             left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            text-align: center;
-            color: rgba(255,255,255,.9);
-            font: 500 11px 'JetBrains Mono', monospace;
-            letter-spacing: .24em;
-            text-shadow: 0 2px 16px #000;
+            top: -48%;
+            width: 72%;
+            aspect-ratio: 1;
+            transform: translateX(-50%) rotate(45deg);
+            border-right: 2px solid rgba(220, 111, 149, .38);
+            border-bottom: 2px solid rgba(220, 111, 149, .38);
+            background: linear-gradient(135deg, #fff 0%, #ffeaf2 100%);
+        }
+
+        .letter-envelope::after {
+            content: '♥';
+            position: absolute;
+            left: 50%;
+            top: 58%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(255, 255, 255, .9);
+            border-radius: 50%;
+            background: #df7799;
+            color: #fff;
+            font-size: 12px;
+            box-shadow: 0 3px 10px rgba(173, 78, 112, .32);
+        }
+
+        .letter-content {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: min(430px, calc(100vw - 32px));
+            max-height: min(520px, calc(100vh - 32px));
+            padding: clamp(28px, 5vw, 52px);
+            box-sizing: border-box;
+            border: 2px solid rgba(255, 255, 255, .96);
+            border-radius: 14px;
+            background:
+                linear-gradient(rgba(255, 255, 255, .82), rgba(255, 239, 246, .94)),
+                repeating-linear-gradient(0deg, transparent 0 27px, rgba(220, 111, 149, .12) 28px);
+            color: #6d3d50;
+            text-align: left;
+            box-shadow:
+                0 24px 70px rgba(0, 0, 0, .68),
+                0 0 28px rgba(255, 194, 218, .3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, -47%) scale(.86) rotate(-2deg);
+            transition:
+                opacity .42s ease,
+                visibility .42s ease,
+                transform .55s cubic-bezier(.22, 1, .36, 1);
             pointer-events: none;
+        }
+
+        .letter-content h2 {
+            margin: 0 0 18px;
+            color: #c95f83;
+            font: 600 clamp(20px, 3vw, 28px) 'Space Grotesk', sans-serif;
+        }
+
+        .letter-content p {
+            margin: 0;
+            font-size: clamp(15px, 2vw, 18px);
+            line-height: 1.75;
+        }
+
+        .memory-letter.open {
+            --letter-left: 50%;
+            --letter-top: 50%;
+            z-index: 40;
+            width: min(430px, calc(100vw - 32px));
+            height: min(520px, calc(100vh - 32px));
+            transform: translate(-50%, -50%) rotate(0deg);
+            filter: none;
+        }
+
+        .memory-letter.open .letter-envelope {
+            opacity: 0;
+        }
+
+        .memory-letter.open .letter-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            pointer-events: auto;
+        }
+
+        .letter-backdrop {
+            position: absolute;
+            inset: 0;
+            z-index: 39;
+            border: 0;
+            background: rgba(0, 0, 0, .58);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity .35s ease, visibility .35s ease;
+        }
+
+        .letter-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .letter-modal {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: 45;
+            width: min(430px, calc(100vw - 32px));
+            max-height: min(520px, calc(100vh - 32px));
+            padding: clamp(28px, 5vw, 52px);
+            box-sizing: border-box;
+            border: 2px solid rgba(255, 255, 255, .96);
+            border-radius: 14px;
+            background:
+                linear-gradient(rgba(255, 255, 255, .92), rgba(255, 239, 246, .97)),
+                repeating-linear-gradient(0deg, transparent 0 27px, rgba(220, 111, 149, .12) 28px);
+            color: #6d3d50;
+            text-align: left;
+            box-shadow:
+                0 24px 70px rgba(0, 0, 0, .68),
+                0 0 28px rgba(255, 194, 218, .3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, -47%) scale(.86) rotate(-2deg);
+            transition:
+                opacity .42s ease,
+                visibility .42s ease,
+                transform .55s cubic-bezier(.22, 1, .36, 1);
+            pointer-events: none;
+            cursor: pointer;
+        }
+
+        .letter-modal.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            pointer-events: auto;
+        }
+
+        .letter-modal h2 {
+            margin: 0 0 18px;
+            color: #c95f83;
+            font: 600 clamp(20px, 3vw, 28px) 'Space Grotesk', sans-serif;
+        }
+
+        .letter-modal p {
+            margin: 0;
+            font-size: clamp(15px, 2vw, 18px);
+            line-height: 1.75;
         }
 
         @media (max-width: 600px) {
-            .panorama-title { font-size: 9px; letter-spacing: .14em; }
-            .panorama-button { padding: 9px 12px; font-size: 10px; }
-            .panorama-hint { font-size: 9px; }
+            .memory-letter {
+                width: 58px;
+                height: 42px;
+            }
+            .memory-letter:nth-of-type(2) { --letter-left: 10%; --letter-top: 24%; }
+            .memory-letter:nth-of-type(3) { --letter-left: 90%; --letter-top: 24%; }
+            .memory-letter:nth-of-type(4) { --letter-left: 10%; --letter-top: 68%; }
+            .memory-letter:nth-of-type(5) { --letter-left: 90%; --letter-top: 68%; }
+            .memory-letter.open {
+                width: calc(100vw - 32px);
+                height: min(520px, calc(100vh - 32px));
+            }
         }
 
         .photo-card {
@@ -1282,14 +1453,11 @@
         <div class="door-warp-flare" aria-hidden="true"></div>
         <section class="memory-sphere" aria-label="Không gian toàn cảnh 360 độ">
             <canvas id="panorama-canvas" aria-label="Kéo để xoay góc nhìn panorama"></canvas>
-            <div class="panorama-title">NOCTIS // IMMERSIVE 360° ENVIRONMENT</div>
-            <div class="panorama-hud">
-                <div class="panorama-hint">KÉO CHUỘT / CHẠM ĐỂ NHÌN XUNG QUANH · CUỘN ĐỂ ZOOM</div>
-                <label class="panorama-button" for="panorama-file">THÊM ẢNH / 360°</label>
-                <input id="panorama-file" type="file" accept="image/*">
-                <button class="panorama-button" id="panorama-reset" type="button">ĐẶT LẠI GÓC NHÌN</button>
-                <button class="panorama-button" id="panorama-fullscreen" type="button">TOÀN MÀN HÌNH</button>
-            </div>
+            <button class="letter-backdrop" type="button" aria-label="Đóng thư"></button>
+            <article class="letter-modal" role="dialog" aria-modal="true" aria-hidden="true">
+                <h2></h2>
+                <p></p>
+            </article>
         </section>
         <div class="pin-lock" role="dialog" aria-modal="true" aria-label="Ổ khóa mật khẩu">
             <div class="lock-icon" aria-hidden="true"></div>
@@ -2643,13 +2811,11 @@
 
         const viewerCanvas = document.getElementById('panorama-canvas');
         const viewerRoot = document.querySelector('.memory-sphere');
-        const uploadInput = document.getElementById('panorama-file');
-        const resetButton = document.getElementById('panorama-reset');
-        const fullscreenButton = document.getElementById('panorama-fullscreen');
 
         let renderer, scene, camera, sphere, animationId;
         let albumGroup = null;
         let albumPhotoMeshes = [];
+        let albumLetterMeshes = [];
         let albumAnimations = [];
         let albumAnimationStart = 0;
         const albumRevealDuration = 600;
@@ -2661,8 +2827,41 @@
         let lastFrameTime = 0;
         const idleRotateDelay = 1400;
         const idleRotateSpeed = 0.035;
-        let activeObjectUrl = null;
         const defaultFov = 75;
+        const letterContents = [
+            ['Gửi anh yêu', 'Cảm ơn anh đã luôn ở đây, nhẹ nhàng và kiên nhẫn. Có anh, mỗi ngày đều trở nên an toàn và đáng nhớ hơn.'],
+            ['Điều em muốn nói', 'Anh đừng quên giữ bình yên cho riêng mình, em luôn tin vào anh và tự hào vì những gì anh đang nỗ lực.'],
+            ['Kỷ niệm nhỏ', 'Mỗi khoảnh khắc bên anh đều là một vì sao nhỏ. Em muốn cùng anh gom tất cả những vì sao ấy thành cả bầu trời.'],
+            ['Luôn ở bên anh', 'Dù ngày mai có thế nào, em vẫn muốn anh biết rằng em yêu anh rất nhiều và sẽ luôn đồng hành cùng anh.']
+        ];
+        let openLetterIndex = -1;
+        let pointerDownX = 0;
+        let pointerDownY = 0;
+        const letterBackdrop = viewerRoot.querySelector('.letter-backdrop');
+        const letterModal = viewerRoot.querySelector('.letter-modal');
+
+        function closeLetterModal() {
+            openLetterIndex = -1;
+            letterBackdrop?.classList.remove('active');
+            letterModal?.classList.remove('active');
+            letterModal?.setAttribute('aria-hidden', 'true');
+        }
+
+        function openLetterModal(index) {
+            if (!letterContents[index] || !letterModal) return;
+            openLetterIndex = index;
+            letterModal.querySelector('h2').textContent = letterContents[index][0];
+            letterModal.querySelector('p').textContent = letterContents[index][1];
+            letterModal.classList.add('active');
+            letterModal.setAttribute('aria-hidden', 'false');
+            letterBackdrop?.classList.add('active');
+        }
+
+        letterBackdrop?.addEventListener('click', closeLetterModal);
+        letterModal?.addEventListener('click', closeLetterModal);
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') closeLetterModal();
+        });
         const albumPhotoUrls = Array.from({ length: 20 }, (_, index) =>
             `image/360/pu${index + 1}.jpg`
         );
@@ -2752,11 +2951,50 @@
             return sprite;
         }
 
+        function makeLetterTexture(number) {
+            const c = document.createElement('canvas');
+            c.width = 512;
+            c.height = 356;
+            const g = c.getContext('2d');
+            g.fillStyle = '#fff7fa';
+            g.fillRect(0, 0, c.width, c.height);
+            g.strokeStyle = '#d98aa7';
+            g.lineWidth = 12;
+            g.strokeRect(6, 6, c.width - 12, c.height - 12);
+            g.fillStyle = '#ffdce9';
+            g.beginPath();
+            g.moveTo(18, 18);
+            g.lineTo(256, 205);
+            g.lineTo(494, 18);
+            g.closePath();
+            g.fill();
+            g.strokeStyle = '#df9ab3';
+            g.lineWidth = 7;
+            g.beginPath();
+            g.moveTo(18, 18);
+            g.lineTo(256, 205);
+            g.lineTo(494, 18);
+            g.stroke();
+            g.fillStyle = '#d56f94';
+            g.beginPath();
+            g.arc(256, 224, 52, 0, Math.PI * 2);
+            g.fill();
+            g.fillStyle = '#ffffff';
+            g.font = '700 44px Inter, sans-serif';
+            g.textAlign = 'center';
+            g.textBaseline = 'middle';
+            g.fillText(number.toString(), 256, 228);
+            const texture = new THREE.CanvasTexture(c);
+            texture.colorSpace = THREE.SRGBColorSpace;
+            return texture;
+        }
+
         function createAlbumCards() {
             if (!scene) return;
             if (albumGroup) scene.remove(albumGroup);
             albumGroup = new THREE.Group();
             albumPhotoMeshes = [];
+            albumLetterMeshes = [];
 
             const photoUrls = albumPhotoUrls;
             const loader = new THREE.TextureLoader();
@@ -2868,6 +3106,70 @@
                     preloadedPhotoImages.delete(photoUrl);
                 }, undefined, (error) => console.error(`Không tải được ảnh gallery "${photoUrl}":`, error));
             }
+
+            const letterCandidates = [];
+            for (let index = 0; index < 24; index++) {
+                const longitude = index * Math.PI * (3 - Math.sqrt(5)) + 0.53;
+                const yRatio = 1 - ((index + 0.5) / 24) * 2;
+                const polar = Math.acos(yRatio);
+                const horizontal = Math.sin(polar);
+                const radius = 430;
+                letterCandidates.push(new THREE.Vector3(
+                    radius * horizontal * Math.cos(longitude),
+                    radius * Math.cos(polar),
+                    radius * horizontal * Math.sin(longitude)
+                ));
+            }
+
+            const letterPositions = [];
+            const minimumLetterDistance = 160;
+            for (const candidate of letterCandidates) {
+                const distanceFromPhotos = photoTargets.every(photo =>
+                    candidate.distanceTo(photo) >= minimumLetterDistance
+                );
+                const distanceFromLetters = letterPositions.every(letter =>
+                    candidate.distanceTo(letter) >= minimumLetterDistance
+                );
+                if (distanceFromPhotos && distanceFromLetters) {
+                    letterPositions.push(candidate);
+                }
+                if (letterPositions.length === 4) break;
+            }
+            letterPositions.forEach((position, index) => {
+                const letter = new THREE.Mesh(
+                    new THREE.PlaneGeometry(112, 78),
+                    new THREE.MeshBasicMaterial({
+                        map: makeLetterTexture(index + 1),
+                        side: THREE.DoubleSide,
+                        transparent: true,
+                        opacity: 0,
+                        depthWrite: false
+                    })
+                );
+                letter.position.copy(position);
+                letter.lookAt(0, 0, 0);
+                letter.rotateZ((index % 2 ? 1 : -1) * 0.10);
+                letter.userData.letterIndex = index;
+                const targetQuaternion = letter.quaternion.clone();
+                const start = new THREE.Vector3(0, 0, -760);
+                letter.position.copy(start);
+                letter.quaternion.copy(targetQuaternion);
+                letter.scale.setScalar(0.02);
+                albumGroup.add(letter);
+                albumLetterMeshes.push(letter);
+                albumAnimations.push({
+                    object: letter,
+                    start,
+                    target: position.clone(),
+                    curve: new THREE.Vector3((index % 2 ? -1 : 1) * 72, 38, 28),
+                    startQuaternion: letter.quaternion.clone(),
+                    targetQuaternion,
+                    delay: 520 + index * 90,
+                    duration: albumRevealDuration,
+                    startScale: 0.02,
+                    targetScale: new THREE.Vector3(1, 1, 1)
+                });
+            });
 
             const notes = [
                 'Em luôn ở đây',
@@ -3065,6 +3367,8 @@
         window.dispatchEvent(new Event('panorama-viewer-ready'));
 
         viewerCanvas.addEventListener('pointerdown', (event) => {
+            pointerDownX = event.clientX;
+            pointerDownY = event.clientY;
             dragging = true; lastX = event.clientX; lastY = event.clientY;
             lastInteractionTime = performance.now();
             viewerCanvas.setPointerCapture(event.pointerId);
@@ -3081,7 +3385,22 @@
             dragging = false;
             lastInteractionTime = performance.now();
         };
-        viewerCanvas.addEventListener('pointerup', stopDrag);
+        viewerCanvas.addEventListener('pointerup', (event) => {
+            const moved = Math.hypot(event.clientX - pointerDownX, event.clientY - pointerDownY);
+            stopDrag();
+            if (moved > 7 || openLetterIndex >= 0) return;
+
+            const rect = viewerCanvas.getBoundingClientRect();
+            const pointer = new THREE.Vector2(
+                ((event.clientX - rect.left) / rect.width) * 2 - 1,
+                -((event.clientY - rect.top) / rect.height) * 2 + 1
+            );
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(pointer, camera);
+            const hits = raycaster.intersectObjects(albumLetterMeshes, false);
+            if (!hits.length) return;
+            openLetterModal(hits[0].object.userData.letterIndex);
+        });
         viewerCanvas.addEventListener('pointercancel', stopDrag);
         viewerCanvas.addEventListener('wheel', (event) => {
             event.preventDefault();
@@ -3090,41 +3409,6 @@
             camera.updateProjectionMatrix();
         }, { passive: false });
 
-        uploadInput?.addEventListener('change', (event) => {
-            const file = event.target.files?.[0];
-            if (!file) return;
-            if (!file.type.startsWith('image/')) return;
-            if (activeObjectUrl) URL.revokeObjectURL(activeObjectUrl);
-            activeObjectUrl = URL.createObjectURL(file);
-            new THREE.TextureLoader().load(activeObjectUrl, (texture) => {
-                applyPanoramaTexture(texture);
-                albumPhotoMeshes.forEach((photo, index) => {
-                    const cardTexture = texture.clone();
-                    cardTexture.needsUpdate = true;
-                    cardTexture.offset.set((index % 4) * .25, (index % 3) * .18);
-                    cardTexture.repeat.set(.25, .82);
-                    photo.material.map = cardTexture;
-                    photo.material.needsUpdate = true;
-                });
-                const hint = document.querySelector('.panorama-hint');
-                if (hint) hint.textContent = 'ĐANG HIỂN THỊ ẢNH CỦA BẠN · KÉO ĐỂ XOAY · CUỘN ĐỂ ZOOM';
-            }, undefined, (error) => {
-                console.error('Không tải được ảnh panorama:', error);
-                alert('Không thể đọc ảnh này. Hãy chọn ảnh panorama 360° dạng JPG hoặc PNG, tốt nhất tỷ lệ 2:1.');
-            });
-        });
-
-        resetButton?.addEventListener('click', () => {
-            targetYaw = 0; targetPitch = 0;
-            lastInteractionTime = performance.now();
-            if (camera) { camera.fov = defaultFov; camera.updateProjectionMatrix(); }
-        });
-        fullscreenButton?.addEventListener('click', async () => {
-            try {
-                if (!document.fullscreenElement) await viewerRoot.requestFullscreen();
-                else await document.exitFullscreen();
-            } catch (error) { console.warn('Fullscreen không khả dụng:', error); }
-        });
         window.addEventListener('resize', resizeViewer);
         document.addEventListener('visibilitychange', () => {
             if (document.hidden && animationId) cancelAnimationFrame(animationId);
